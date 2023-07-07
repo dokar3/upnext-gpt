@@ -6,7 +6,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -48,6 +47,7 @@ import io.upnextgpt.ui.home.viewmodel.HomeUiState
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.home.viewmodel.PlayerMeta
 import io.upnextgpt.ui.shared.compose.rememberLifecycleEvent
+import io.upnextgpt.ui.shared.widget.SpringDragBox
 import kotlinx.coroutines.launch
 
 @Composable
@@ -116,8 +116,12 @@ private fun Player(
 
     val playerSelectorSheetState = rememberBottomSheetState()
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.verticalScroll(state = scrollState)) {
+    SpringDragBox(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(state = scrollState)
+        ) {
             CoverView(
                 key = trackInfo.hashCode(),
                 bitmap = ImmutableHolder(uiState.albumArt)
@@ -192,6 +196,8 @@ private fun Player(
             Spacer(modifier = Modifier.height(16.dp))
 
             UpNextCard()
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         SnackbarHost(
