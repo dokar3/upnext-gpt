@@ -1,0 +1,235 @@
+package io.upnextgpt.ui.home
+
+import android.app.Activity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dokar.sheets.rememberBottomSheetState
+import io.upnextgpt.base.ImmutableHolder
+import io.upnextgpt.base.SealedResult
+import io.upnextgpt.base.util.IntentUtil
+import io.upnextgpt.ui.home.control.CoverView
+import io.upnextgpt.ui.home.control.PlayControlCard
+import io.upnextgpt.ui.home.control.PlayerCard
+import io.upnextgpt.ui.home.control.PlayerProgressBar
+import io.upnextgpt.ui.home.control.UpNextCard
+import io.upnextgpt.ui.home.viewmodel.HomeUiState
+import io.upnextgpt.ui.home.viewmodel.HomeViewModel
+import io.upnextgpt.ui.home.viewmodel.PlayerMeta
+import io.upnextgpt.ui.shared.compose.rememberLifecycleEvent
+import kotlinx.coroutines.launch
+
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(
+        factory = HomeViewModel.Factory(
+            application = (LocalContext.current as Activity).application,
+        ),
+    )
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    val lifecycleEvent = rememberLifecycleEvent()
+
+    LaunchedEffect(viewModel, lifecycleEvent) {
+        if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
+            viewModel.updatePlayerConnectionStatus()
+        }
+    }
+
+    Column(modifier = modifier) {
+        AnimatedVisibility(
+            visible = !uiState.isConnectedToPlayers,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+        ) {
+            PlayersNotConnectedBar(
+                onConnectClick = { viewModel.connectToPlayer() },
+            )
+        }
+
+        TitleBar(modifier = Modifier.padding(horizontal = 32.dp))
+
+        Player(
+            uiState = uiState,
+            onPlay = viewModel::play,
+            onPause = viewModel::pause,
+            onSeek = viewModel::seek,
+            onSelectPlayer = viewModel::selectPlayer,
+            modifier = Modifier.padding(horizontal = 32.dp),
+        )
+    }
+}
+
+@Composable
+private fun Player(
+    uiState: HomeUiState,
+    onPlay: () -> Unit,
+    onPause: () -> Unit,
+    onSeek: (position: Long) -> Unit,
+    onSelectPlayer: (meta: PlayerMeta) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    val currPlayer = uiState.activeOrFirstPlayer
+
+    val trackInfo = uiState.trackInfo
+
+    val scope = rememberCoroutineScope()
+
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    val scrollState = rememberScrollState()
+
+    val playerSelectorSheetState = rememberBottomSheetState()
+
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(modifier = Modifier.verticalScroll(state = scrollState)) {
+            CoverView(
+                key = trackInfo.hashCode(),
+                bitmap = ImmutableHolder(uiState.albumArt)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PlayerProgressBar(
+                isPlaying = uiState.isPlaying,
+                position = uiState.position,
+                duration = uiState.duration,
+                onSeek = onSeek,
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = trackInfo?.title ?: "Not Playing",
+                fontSize = 18.sp,
+            )
+
+            Text(text = trackInfo?.artist ?: "-")
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                PlayerCard(
+                    playerName = currPlayer.name,
+                    iconRes = currPlayer.iconRes,
+                    themeColor = currPlayer.themeColor,
+                    onClick = {
+                        scope.launch { playerSelectorSheetState.expand() }
+                    },
+                    onLaunchPlayerClick = {
+                        val ret = IntentUtil.lunchApp(
+                            context,
+                            currPlayer.packageName
+                        )
+                        when (ret) {
+                            is SealedResult.Err -> scope.launch {
+                                snackBarHostState
+                                    .showSnackbar(
+                                        message = ret.error,
+                                        withDismissAction = true,
+                                    )
+                            }
+
+                            is SealedResult.Ok -> {}
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+
+                PlayControlCard(
+                    isPlaying = uiState.isPlaying,
+                    onPrevClick = {},
+                    onPlayPauseClick = {
+                        if (uiState.isPlaying) {
+                            onPause()
+                        } else {
+                            onPlay()
+                        }
+                    },
+                    onNextClick = {},
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            UpNextCard()
+        }
+
+        SnackbarHost(
+            hostState = snackBarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+    }
+
+    PlayerSelectorSheet(
+        state = playerSelectorSheetState,
+        items = ImmutableHolder(uiState.players),
+        onSelect = {
+            scope.launch { playerSelectorSheetState.collapse() }
+            onSelectPlayer(it)
+        },
+    )
+}
+
+@Composable
+private fun PlayersNotConnectedBar(
+    onConnectClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color(0xFFFF9800))
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(text = "Players are not connected.")
+
+        TextButton(
+            onClick = onConnectClick,
+            colors = ButtonDefaults.textButtonColors(contentColor = Color.White),
+        ) {
+            Text("Connect")
+        }
+    }
+}
