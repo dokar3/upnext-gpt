@@ -18,7 +18,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 
-private const val API_BASE_URL = "http://localhost:8080"
+private const val API_BASE_URL = "https://upnextgpt.vercel.app"
 
 val appModule = module {
     single<DataStore<Preferences>> { androidContext().dataStore }

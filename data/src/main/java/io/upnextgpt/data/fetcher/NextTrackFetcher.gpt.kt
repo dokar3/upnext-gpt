@@ -11,7 +11,8 @@ class GptNextTrackFetcher(
         queue: List<TrackInfo>
     ): SealedResult<TrackInfo, Exception> {
         val res = try {
-            nextTrackService.nextTrack(queue)
+            val body = NextTrackService.NextTrackBody(queue = queue)
+            nextTrackService.nextTrack(body)
         } catch (e: Exception) {
             return SealedResult.Err(e)
         }
