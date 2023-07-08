@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import io.upnextgpt.base.Logger
 import io.upnextgpt.base.util.IntentUtil
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.remote.palyer.PlayState
@@ -46,6 +47,7 @@ class HomeViewModel(
             player.playbackInfoFlow()
                 .collect { info ->
                     val packageName = info?.packageName
+                        ?: uiState.value.activeOrFirstPlayer.packageName
                     val players = playerList.map {
                         it.copy(isActive = packageName == it.packageName)
                     }
@@ -74,15 +76,15 @@ class HomeViewModel(
     }
 
     fun pause() {
-        player.pause()
+        controlOrLunchPlayer { player.pause() }
     }
 
     fun play() {
-        player.play()
+        controlOrLunchPlayer { player.play() }
     }
 
     fun seek(position: Long) {
-        player.seek(position)
+        controlOrLunchPlayer { player.seek(position) }
     }
 
     fun selectPlayer(meta: PlayerMeta) = viewModelScope.launch(dispatcher) {
@@ -91,12 +93,6 @@ class HomeViewModel(
             return@launch
         }
 
-        val players = playerList.map {
-            it.copy(isActive = it.packageName == meta.packageName)
-        }
-        _uiState.update {
-            it.copy(players = players)
-        }
         player.pause()
         player.destroy()
         player = NotificationBasedPlayer(
@@ -104,6 +100,11 @@ class HomeViewModel(
             specifiedPackageName = meta.packageName,
         )
         listenPlaybackUpdates()
+
+        val players = playerList.map {
+            it.copy(isActive = it.packageName == meta.packageName)
+        }
+        _uiState.update { it.copy(players = players) }
     }
 
     private fun updatePlayerList() = viewModelScope.launch(dispatcher) {
@@ -124,6 +125,15 @@ class HomeViewModel(
                 )
             }
             _uiState.update { it.copy(players = players) }
+        }
+    }
+
+    private inline fun controlOrLunchPlayer(action: () -> Unit) {
+        if (player.isControllable()) {
+            action()
+        } else {
+            val activePlayer = uiState.value.activeOrFirstPlayer
+            IntentUtil.lunchApp(context, activePlayer.packageName)
         }
     }
 

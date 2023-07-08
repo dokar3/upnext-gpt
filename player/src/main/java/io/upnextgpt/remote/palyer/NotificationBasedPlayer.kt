@@ -64,25 +64,28 @@ class NotificationBasedPlayer(
             return
         }
 
+        if (specifiedPackageName != null) {
+            val info = playbackInfoList.find {
+                it.packageName == specifiedPackageName
+            }
+            updatePlaybackInfo(info)
+            return
+        }
+
         // Find playing or specified
-        var activePlaybackInfo = if (specifiedPackageName != null) {
-            playbackInfoList.find { it.packageName == specifiedPackageName }
-        } else {
-            playbackInfoList.find { it.playState == PlayState.Playing }
+        var activePlaybackInfo = playbackInfoList.find {
+            it.playState == PlayState.Playing
         }
 
         // Find by previous package name or specified
         if (activePlaybackInfo == null && currPlaybackInfo != null) {
-            activePlaybackInfo = if (specifiedPackageName != null) {
-                playbackInfoList.find { it.packageName == specifiedPackageName }
-            } else {
-                playbackInfoList.find {
-                    it.packageName == currPlaybackInfo?.packageName
-                }
+            activePlaybackInfo = playbackInfoList.find {
+                it.packageName == currPlaybackInfo?.packageName
             }
         }
 
-        if (activePlaybackInfo == null && specifiedPackageName == null) {
+        // Use the first
+        if (activePlaybackInfo == null) {
             activePlaybackInfo = playbackInfoList.first()
         }
 
@@ -129,6 +132,10 @@ class NotificationBasedPlayer(
 
     override fun isConnected(): Boolean {
         return Notifications.isNotificationServiceEnabled(context)
+    }
+
+    override fun isControllable(): Boolean {
+        return currentNotification() != null
     }
 
     override fun connect() {

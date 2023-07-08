@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 interface RemotePlayer : PlayerActions {
     fun isConnected(): Boolean
 
+    fun isControllable(): Boolean
+
     fun connect()
 
     fun prepare()

@@ -27,3 +27,4 @@ file("./ui").listFiles(File::isDirectory)
     }
 
 include(":player")
+include(":data")

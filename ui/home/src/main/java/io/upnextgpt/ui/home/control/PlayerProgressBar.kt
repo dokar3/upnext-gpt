@@ -23,14 +23,14 @@ import kotlin.system.measureTimeMillis
 
 private fun millisToDisplayTime(millis: Long): String {
     if (millis <= 0) {
-        return "-"
+        return "0:00"
     }
     val minutes = millis / 60000
     val seconds = (millis % 60000) / 1000
     fun padWithZero(number: Long): String {
         return String.format("%02d", number)
     }
-    return "${padWithZero(minutes)}:${padWithZero(seconds)}"
+    return "${minutes}:${padWithZero(seconds)}"
 }
 
 @Composable
