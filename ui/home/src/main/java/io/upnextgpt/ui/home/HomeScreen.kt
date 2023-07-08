@@ -195,6 +195,7 @@ private fun Player(
             Spacer(modifier = Modifier.height(16.dp))
 
             UpNextCard(
+                isRolling = uiState.isLoadingNextTrack,
                 nextTrack = uiState.nextTrack,
                 onPlayClick = { uiState.nextTrack?.let { onPlayTrack(it) } },
                 onRollClick = {},

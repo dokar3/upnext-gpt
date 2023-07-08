@@ -42,10 +42,8 @@ data class HomeUiState(
     val position: Long = 0L,
     val duration: Long = 0L,
     val albumArt: Bitmap? = null,
-    val nextTrack: TrackInfo? = TrackInfo(
-        title = "Help!",
-        artist = "Beatles",
-    ),
+    val nextTrack: TrackInfo? = null,
+    val isLoadingNextTrack: Boolean = false,
 ) {
     val activePlayer = players.firstOrNull { it.isActive }
 }
