@@ -15,10 +15,11 @@ import kotlinx.coroutines.launch
 
 class NotificationBasedPlayer(
     private val context: Context,
-    private val specifiedPackageName: String? = null,
 ) : RemotePlayer, NotificationCallback {
     private val coroutineScope =
         CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    private var targetPlayer: String? = null
 
     private var activeNotifications: Array<StatusBarNotification>? = null
 
@@ -28,32 +29,35 @@ class NotificationBasedPlayer(
     private val playbackInfoFlow = MutableSharedFlow<PlaybackInfo?>()
 
     override fun onListenerServiceConnected() {
-        Logger.d(TAG, "onListenerServiceConnected()")
         Notifications.queryActiveNotifications(context)
     }
 
     override fun onListenerServiceDisconnected() {
-        Logger.d(TAG, "onListenerServiceDisconnected()")
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        Logger.d(TAG, "onNotificationPosted($sbn)")
         Notifications.queryActiveNotifications(context)
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        Logger.d(TAG, "onNotificationRemoved($sbn)")
         Notifications.queryActiveNotifications(context)
     }
 
     override fun onActiveNotificationsUpdated(
         sbns: Array<StatusBarNotification>
     ) {
-        Logger.d(TAG, "activeNotifications: ${sbns.size}")
         activeNotifications = sbns
         val playbackInfoList = MediaNotificationHelper.parse(context, sbns)
-        Logger.d(TAG, "playStates: ${playbackInfoList.joinToString("\n")}")
         updatePlaybackInfoAndState(playbackInfoList)
+    }
+
+    fun updateTargetPlayer(packageName: String?) {
+        if (targetPlayer == packageName) {
+            return
+        }
+        targetPlayer = packageName
+        pause()
+        Notifications.queryActiveNotifications(context)
     }
 
     private fun updatePlaybackInfoAndState(
@@ -64,9 +68,9 @@ class NotificationBasedPlayer(
             return
         }
 
-        if (specifiedPackageName != null) {
+        if (targetPlayer != null) {
             val info = playbackInfoList.find {
-                it.packageName == specifiedPackageName
+                it.packageName == targetPlayer
             }
             updatePlaybackInfo(info)
             return

@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,7 +37,7 @@ internal fun PlayerCard(
     @DrawableRes
     iconRes: Int,
     themeColor: Color,
-    onClick: ()->Unit,
+    onClick: () -> Unit,
     onLaunchPlayerClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -48,37 +49,9 @@ internal fun PlayerCard(
         padding = PaddingValues(0.dp),
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            Image(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(Color.White),
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(48.dp)
-                    .graphicsLayer {
-                        scaleX = 1.5f
-                        scaleY = 1.5f
-                        alpha = 0.99f
-                        rotationZ = -25f
-                    }
-                    .drawWithCache {
-                        val gradientBrush = Brush.linearGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.8f),
-                            ),
-                            start = Offset.Zero,
-                            end = Offset(size.width, size.height),
-                        )
-                        onDrawWithContent {
-                            drawContent()
-                            drawRect(
-                                brush = gradientBrush,
-                                blendMode = BlendMode.DstIn
-                            )
-                        }
-                    },
-            )
+            if (iconRes != 0) {
+                PlayerIcon(iconRes = iconRes)
+            }
 
             Column(
                 modifier = Modifier
@@ -104,4 +77,42 @@ internal fun PlayerCard(
             }
         }
     }
+}
+
+@Composable
+private fun BoxScope.PlayerIcon(
+    iconRes: Int,
+    modifier: Modifier = Modifier,
+) {
+    Image(
+        painter = painterResource(iconRes),
+        contentDescription = null,
+        colorFilter = ColorFilter.tint(Color.White),
+        modifier = modifier
+            .align(Alignment.CenterEnd)
+            .size(48.dp)
+            .graphicsLayer {
+                scaleX = 1.5f
+                scaleY = 1.5f
+                alpha = 0.99f
+                rotationZ = -25f
+            }
+            .drawWithCache {
+                val gradientBrush = Brush.linearGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        Color.Black.copy(alpha = 0.8f),
+                    ),
+                    start = Offset.Zero,
+                    end = Offset(size.width, size.height),
+                )
+                onDrawWithContent {
+                    drawContent()
+                    drawRect(
+                        brush = gradientBrush,
+                        blendMode = BlendMode.DstIn
+                    )
+                }
+            },
+    )
 }

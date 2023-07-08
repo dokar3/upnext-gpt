@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "io.upnextgpt.ui.home"
+    namespace = "io.upnextgpt.data"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -31,27 +31,13 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-    }
 }
 
 dependencies {
-    implementation(projects.base)
-    implementation(projects.data)
-    implementation(projects.player)
-    implementation(projects.ui.shared)
 
-    implementation(libs.ui)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.tooling.preview)
-    implementation(libs.material3)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.sheets)
+    implementation(libs.core.ktx)
+    implementation(libs.appcompat)
+    implementation(libs.androidx.datastore)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

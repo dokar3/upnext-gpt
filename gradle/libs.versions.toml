@@ -15,6 +15,7 @@ appcompat = "1.6.1"
 material = "1.9.0"
 lifecycleViewmodelKtx = "2.6.1"
 lifecycleCommon = "2.6.1"
+dataStore="1.0.0"
 sheets = "0.4.3"
 
 [libraries]
@@ -39,6 +40,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelKtx" }
 androidx-lifecycle-common = { group = "androidx.lifecycle", name = "lifecycle-common", version.ref = "lifecycleCommon" }
+androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
 sheets = { group = "io.github.dokar3", name = "sheets", version.ref = "sheets" }
 
 [plugins]

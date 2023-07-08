@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -104,7 +105,7 @@ private fun Player(
 ) {
     val context = LocalContext.current
 
-    val currPlayer = uiState.activeOrFirstPlayer
+    val currPlayer = uiState.activePlayer
 
     val trackInfo = uiState.trackInfo
 
@@ -152,18 +153,18 @@ private fun Player(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 PlayerCard(
-                    playerName = currPlayer.name,
-                    iconRes = currPlayer.iconRes,
-                    themeColor = currPlayer.themeColor,
+                    playerName = currPlayer?.name ?: "-",
+                    iconRes = currPlayer?.iconRes ?: 0,
+                    themeColor = currPlayer?.themeColor
+                        ?: MaterialTheme.colorScheme.secondary,
                     onClick = {
                         scope.launch { playerSelectorSheetState.expand() }
                     },
                     onLaunchPlayerClick = {
-                        val ret = IntentUtil.lunchApp(
-                            context,
-                            currPlayer.packageName
-                        )
-                        when (ret) {
+                        val packageName = currPlayer?.packageName
+                            ?: return@PlayerCard
+                        when (val ret =
+                            IntentUtil.lunchApp(context, packageName)) {
                             is SealedResult.Err -> scope.launch {
                                 snackBarHostState
                                     .showSnackbar(

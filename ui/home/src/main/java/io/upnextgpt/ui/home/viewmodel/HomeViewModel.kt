@@ -5,8 +5,8 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import io.upnextgpt.base.Logger
 import io.upnextgpt.base.util.IntentUtil
+import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.remote.palyer.PlayState
 import io.upnextgpt.remote.palyer.toTrackInfo
@@ -24,7 +24,9 @@ class HomeViewModel(
 ) : ViewModel() {
     private val context: Context get() = application.applicationContext
 
-    private var player = NotificationBasedPlayer(context)
+    private val settings = Settings.getInstance(context)
+
+    private val player = NotificationBasedPlayer(context)
 
     private var playerListenJob: Job? = null
 
@@ -37,7 +39,18 @@ class HomeViewModel(
     init {
         updatePlayerList()
         updatePlayerConnectionStatus()
+        listenCurrPlayerChanges()
         listenPlaybackUpdates()
+    }
+
+    private fun listenCurrPlayerChanges() = viewModelScope.launch(dispatcher) {
+        settings.currentPlayerFlow.collect { currPlayer ->
+            player.updateTargetPlayer(packageName = currPlayer)
+            val players = playerList.map {
+                it.copy(isActive = it.packageName == currPlayer)
+            }
+            _uiState.update { it.copy(players = players) }
+        }
     }
 
     private fun listenPlaybackUpdates() {
@@ -47,7 +60,7 @@ class HomeViewModel(
             player.playbackInfoFlow()
                 .collect { info ->
                     val packageName = info?.packageName
-                        ?: uiState.value.activeOrFirstPlayer.packageName
+                        ?: uiState.value.activePlayer?.packageName
                     val players = playerList.map {
                         it.copy(isActive = packageName == it.packageName)
                     }
@@ -88,23 +101,11 @@ class HomeViewModel(
     }
 
     fun selectPlayer(meta: PlayerMeta) = viewModelScope.launch(dispatcher) {
-        val currPlayer = uiState.value.activeOrFirstPlayer
+        val currPlayer = uiState.value.activePlayer
         if (currPlayer == meta) {
             return@launch
         }
-
-        player.pause()
-        player.destroy()
-        player = NotificationBasedPlayer(
-            context = context,
-            specifiedPackageName = meta.packageName,
-        )
-        listenPlaybackUpdates()
-
-        val players = playerList.map {
-            it.copy(isActive = it.packageName == meta.packageName)
-        }
-        _uiState.update { it.copy(players = players) }
+        settings.updateCurrentPlayer(meta.packageName)
     }
 
     private fun updatePlayerList() = viewModelScope.launch(dispatcher) {
@@ -132,8 +133,10 @@ class HomeViewModel(
         if (player.isControllable()) {
             action()
         } else {
-            val activePlayer = uiState.value.activeOrFirstPlayer
-            IntentUtil.lunchApp(context, activePlayer.packageName)
+            val activePlayer = uiState.value.activePlayer
+            if (activePlayer != null) {
+                IntentUtil.lunchApp(context, activePlayer.packageName)
+            }
         }
     }
 

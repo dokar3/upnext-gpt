@@ -43,6 +43,5 @@ data class HomeUiState(
     val duration: Long = 0L,
     val albumArt: Bitmap? = null,
 ) {
-    val activeOrFirstPlayer =
-        players.firstOrNull { it.isActive } ?: players.first()
+    val activePlayer = players.firstOrNull { it.isActive }
 }
