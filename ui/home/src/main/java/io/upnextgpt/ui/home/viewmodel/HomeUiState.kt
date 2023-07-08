@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import io.upnextgpt.ui.shared.R
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import io.upnextgpt.data.model.TrackInfo
+import io.upnextgpt.data.model.Track
 
 internal val SupportedPlayers = listOf(
     PlayerMeta(
@@ -37,12 +37,12 @@ internal val SupportedPlayers = listOf(
 data class HomeUiState(
     val players: List<PlayerMeta> = SupportedPlayers,
     val isConnectedToPlayers: Boolean = true,
-    val currTrack: TrackInfo? = null,
+    val currTrack: Track? = null,
     val isPlaying: Boolean = false,
     val position: Long = 0L,
     val duration: Long = 0L,
     val albumArt: Bitmap? = null,
-    val nextTrack: TrackInfo? = null,
+    val nextTrack: Track? = null,
     val isLoadingNextTrack: Boolean = false,
     val error: String? = null,
 ) {

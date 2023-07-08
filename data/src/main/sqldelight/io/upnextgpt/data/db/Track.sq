@@ -1,0 +1,38 @@
+CREATE TABLE track (
+  id INTEGER PRIMARY KEY NOT NULL,
+  title TEXT NOT NULL,
+  artist TEXT NOT NULL,
+  album TEXT,
+  albumArtist TEXT,
+  duration INTEGER NOT NULL,
+  liked INTEGER,
+  disliked INTEGER,
+  queueId TEXT,
+  addedAt INTEGER NOT NULL,
+  updatedAt INTEGER NOT NULL
+);
+
+selectAll:
+SELECT * FROM track ORDER BY addedAt DESC;
+
+selectQueue:
+SELECT * FROM track WHERE queueId = ? ORDER BY addedAt DESC;
+
+select:
+SELECT * FROM track WHERE id = ?;
+
+exists:
+SELECT EXISTS(SELECT 1 FROM track WHERE id = ?);
+
+save:
+INSERT OR REPLACE INTO track(
+  id, title, artist, album, albumArtist,
+  duration, liked, disliked, queueId, addedAt, updatedAt
+)
+VALUES ?;
+
+delete:
+DELETE FROM track WHERE id = ?;
+
+clearQueue:
+DELETE FROM track WHERE queueId = ?;

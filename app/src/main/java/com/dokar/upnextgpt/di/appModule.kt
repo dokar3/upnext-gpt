@@ -2,11 +2,16 @@ package com.dokar.upnextgpt.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import io.upnextgpt.Database
 import io.upnextgpt.base.AppLauncher
 import io.upnextgpt.base.ContextAppLauncher
 import io.upnextgpt.data.api.NextTrackService
+import io.upnextgpt.data.dao.TrackDao
 import io.upnextgpt.data.fetcher.GptNextTrackFetcher
 import io.upnextgpt.data.fetcher.NextTrackFetcher
+import io.upnextgpt.data.repository.TrackRepository
 import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.data.settings.dataStore
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
@@ -35,7 +40,21 @@ val appModule = module {
 
     single<NextTrackFetcher> { GptNextTrackFetcher(nextTrackService = get()) }
 
+    single<SqlDriver> {
+        AndroidSqliteDriver(
+            Database.Schema,
+            androidContext(),
+            "app.db"
+        )
+    }
+
+    single<Database> { Database(driver = get()) }
+
     factory { NotificationBasedPlayer(context = androidContext()) }
+
+    factory { TrackDao(database = get()) }
+
+    factory { TrackRepository(trackDao = get()) }
 
     viewModel<HomeViewModel> {
         HomeViewModel(
@@ -43,6 +62,7 @@ val appModule = module {
             settings = get(),
             appLauncher = get(),
             nextTrackFetcher = get(),
+            trackRepo = get(),
         )
     }
 }

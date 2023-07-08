@@ -40,7 +40,7 @@ import com.dokar.sheets.rememberBottomSheetState
 import io.upnextgpt.base.ImmutableHolder
 import io.upnextgpt.base.SealedResult
 import io.upnextgpt.base.util.IntentUtil
-import io.upnextgpt.data.model.TrackInfo
+import io.upnextgpt.data.model.Track
 import io.upnextgpt.ui.home.control.CoverView
 import io.upnextgpt.ui.home.control.PlayControlCard
 import io.upnextgpt.ui.home.control.PlayerCard
@@ -108,7 +108,7 @@ private fun Player(
     onPause: () -> Unit,
     onSeek: (position: Long) -> Unit,
     onSelectPlayer: (meta: PlayerMeta) -> Unit,
-    onPlayTrack: (track: TrackInfo) -> Unit,
+    onPlayTrack: (track: Track) -> Unit,
     onFetchNextTrackClick: () -> Unit,
     onClearError: () -> Unit,
     modifier: Modifier = Modifier
@@ -117,7 +117,7 @@ private fun Player(
 
     val currPlayer = uiState.activePlayer
 
-    val trackInfo = uiState.currTrack
+    val track = uiState.currTrack
 
     val scope = rememberCoroutineScope()
 
@@ -151,7 +151,7 @@ private fun Player(
                 .verticalScroll(state = scrollState)
         ) {
             CoverView(
-                key = trackInfo.hashCode(),
+                key = track?.title + track?.artist,
                 bitmap = ImmutableHolder(uiState.albumArt)
             )
 
@@ -167,12 +167,12 @@ private fun Player(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = trackInfo?.title ?: "Not Playing",
+                text = track?.title ?: "Not Playing",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
             )
 
-            Text(text = trackInfo?.artist ?: "-")
+            Text(text = track?.artist ?: "-")
 
             Spacer(modifier = Modifier.height(16.dp))
 

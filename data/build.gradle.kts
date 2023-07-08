@@ -3,6 +3,15 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.sqldelight)
+}
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("io.upnextgpt")
+        }
+    }
 }
 
 android {
@@ -52,6 +61,7 @@ dependencies {
     api(libs.retrofit)
     api(libs.retrofit.converter.moshi)
     api(libs.androidx.datastore)
+    api(libs.sqldelight.driver)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

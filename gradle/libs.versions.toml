@@ -21,6 +21,7 @@ koinCompose = "3.4.5"
 ksp = "1.8.22-1.0.11"
 moshi = "1.15.0"
 retrofit = "2.9.0"
+sqldelight = "2.0.0-rc02"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -60,11 +61,14 @@ moshi-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", v
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "retrofit" }
 
+sqldelight-driver = { group = "app.cash.sqldelight", name = "android-driver", version.ref = "sqldelight" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 
 [bundles]
 

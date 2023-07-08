@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import io.upnextgpt.base.AppLauncher
 import io.upnextgpt.base.SealedResult
 import io.upnextgpt.data.fetcher.NextTrackFetcher
-import io.upnextgpt.data.model.TrackInfo
+import io.upnextgpt.data.model.Track
+import io.upnextgpt.data.repository.TrackRepository
 import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.remote.palyer.PlayState
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,6 +28,7 @@ class HomeViewModel(
     private val settings: Settings,
     private val appLauncher: AppLauncher,
     private val nextTrackFetcher: NextTrackFetcher,
+    private val trackRepo: TrackRepository,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
     private var playerListenJob: Job? = null
@@ -36,15 +39,17 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState
 
-    private val _playerQueue = MutableStateFlow<List<TrackInfo>>(emptyList())
-    val playerQueue: StateFlow<List<TrackInfo>> = _playerQueue
+    private val _playerQueue = MutableStateFlow<List<Track>>(emptyList())
+    val playerQueue: StateFlow<List<Track>> = _playerQueue
 
     init {
+        loadQueue()
         updatePlayerList()
         updatePlayerConnectionStatus()
         listenCurrPlayer()
         listenPlaybackUpdates()
         listenCurrTrack()
+        listenNextTrack()
     }
 
     private fun listenCurrPlayer() = viewModelScope.launch(dispatcher) {
@@ -87,9 +92,27 @@ class HomeViewModel(
             .filterNotNull()
             .distinctUntilChangedBy { it.title + it.artist }
             .collect { currTrack ->
-                _playerQueue.update { it + listOf(currTrack) }
+                _playerQueue.update { listOf(currTrack) + it }
+                trackRepo.save(currTrack)
                 fetchNextTrack()
             }
+    }
+
+    private fun listenNextTrack() = viewModelScope.launch(dispatcher) {
+        uiState.map { it.nextTrack?.id }
+            .filterNotNull()
+            .collect { nextTrackId ->
+                settings.updateNextTrackId(nextTrackId)
+            }
+    }
+
+    private fun loadQueue() = viewModelScope.launch(dispatcher) {
+        val list = trackRepo.getQueueTracks(queueId = null)
+        _playerQueue.update { list }
+
+        val nextTrackId = settings.nextTrackIdFlow.firstOrNull()
+        val nextTrack = list.find { it.id == nextTrackId }
+        _uiState.update { it.copy(nextTrack = nextTrack) }
     }
 
     fun updatePlayerConnectionStatus() = viewModelScope.launch(dispatcher) {
@@ -114,7 +137,7 @@ class HomeViewModel(
         controlOrLaunchPlayer { player.seek(position) }
     }
 
-    fun playTrack(track: TrackInfo) {
+    fun playTrack(track: Track) {
         val currPlayer = uiState.value.activePlayer ?: return
         appLauncher.playTrack(
             packageName = currPlayer.packageName,
@@ -136,8 +159,16 @@ class HomeViewModel(
         _uiState.update { it.copy(error = null) }
     }
 
+    fun clearQueue() = viewModelScope.launch(dispatcher) {
+        trackRepo.clearQueue(queueId = null)
+    }
+
     fun fetchNextTrack() {
         fetchNextTrackJob?.cancel()
+        val queue = playerQueue.value
+        if (queue.isEmpty()) {
+            return
+        }
         fetchNextTrackJob = viewModelScope.launch(dispatcher) {
             _uiState.update {
                 it.copy(
@@ -145,7 +176,6 @@ class HomeViewModel(
                     error = null,
                 )
             }
-            val queue = playerQueue.value
             when (val ret = nextTrackFetcher.fetch(queue)) {
                 is SealedResult.Err -> _uiState.update {
                     it.copy(

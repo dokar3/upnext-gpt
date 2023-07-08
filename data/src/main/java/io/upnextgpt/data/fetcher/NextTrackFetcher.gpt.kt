@@ -2,14 +2,14 @@ package io.upnextgpt.data.fetcher
 
 import io.upnextgpt.base.SealedResult
 import io.upnextgpt.data.api.NextTrackService
-import io.upnextgpt.data.model.TrackInfo
+import io.upnextgpt.data.model.Track
 
 class GptNextTrackFetcher(
     private val nextTrackService: NextTrackService,
 ) : NextTrackFetcher {
     override suspend fun fetch(
-        queue: List<TrackInfo>
-    ): SealedResult<TrackInfo, Exception> {
+        queue: List<Track>
+    ): SealedResult<Track, Exception> {
         val res = try {
             val body = NextTrackService.NextTrackBody(queue = queue)
             nextTrackService.nextTrack(body)

@@ -2,7 +2,7 @@ package io.upnextgpt.remote.palyer
 
 import android.graphics.Bitmap
 import android.media.session.MediaSession
-import io.upnextgpt.data.model.TrackInfo
+import io.upnextgpt.data.model.Track
 
 data class PlaybackInfo(
     val mediaSession: MediaSession.Token,
@@ -19,8 +19,8 @@ data class PlaybackInfo(
     val albumArt: Bitmap?,
 )
 
-fun PlaybackInfo.toTrackInfo(): TrackInfo {
-    return TrackInfo(
+fun PlaybackInfo.toTrackInfo(): Track {
+    return Track(
         title = this.title ?: "Unknown",
         artist = this.artist ?: "Unknown",
         album = this.album,
