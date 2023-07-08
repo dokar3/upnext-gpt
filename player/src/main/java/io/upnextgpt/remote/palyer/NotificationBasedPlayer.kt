@@ -119,7 +119,6 @@ class NotificationBasedPlayer(
         coroutineScope.launch {
             val isBound = Notifications.bindNotificationServiceSync(context)
             if (isBound) {
-                Logger.d(TAG, "Registering notification callback")
                 Notifications.registerNotificationCallback(this@NotificationBasedPlayer)
                 Notifications.queryActiveNotifications(context)
             } else {
@@ -171,7 +170,6 @@ class NotificationBasedPlayer(
     }
 
     override fun seek(position: Long) {
-        Logger.d(TAG, "seekTo($position)")
         currentNotification()?.let {
             MediaNotificationHelper.findMediaController(it)?.seekTo(position)
             Notifications.queryActiveNotifications(context)

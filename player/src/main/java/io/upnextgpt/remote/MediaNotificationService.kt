@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.os.IBinder
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import io.upnextgpt.base.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,14 +30,11 @@ class MediaNotificationService : NotificationListenerService() {
 
     override fun onBind(intent: Intent?): IBinder? {
         val binder = super.onBind(intent)
-        Logger.d(TAG, "onBind()")
         return binder
     }
 
     override fun onCreate() {
         super.onCreate()
-        Logger.d(TAG, "onCreate()")
-
         val filter = IntentFilter()
         filter.addAction(ACTION_QUERY_ACTIVE_NOTIFICATIONS)
         registerReceiver(broadcastReceiver, filter)
@@ -46,24 +42,20 @@ class MediaNotificationService : NotificationListenerService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Logger.d(TAG, "onDestroy()")
         unregisterReceiver(broadcastReceiver)
     }
 
     override fun onRebind(intent: Intent?) {
         super.onRebind(intent)
-        Logger.d(TAG, "onRebind()")
     }
 
     override fun onListenerConnected() {
         Notifications.onListenerServiceConnected()
         Notifications.onActiveNotificationsUpdated(activeNotifications)
-        Logger.d(TAG, "onListenerConnected() notifications: ${activeNotifications.size}")
     }
 
     override fun onListenerDisconnected() {
         Notifications.onListenerServiceDisconnected()
-        Logger.d(TAG, "onListenerDisconnected()")
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
@@ -71,7 +63,6 @@ class MediaNotificationService : NotificationListenerService() {
             return
         }
         Notifications.onNotificationPosted(sbn)
-        Logger.d(TAG, "onNotificationPosted()")
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
@@ -79,7 +70,6 @@ class MediaNotificationService : NotificationListenerService() {
             return
         }
         Notifications.onNotificationRemoved(sbn)
-        Logger.d(TAG, "onNotificationRemoved()")
     }
 
     companion object {
