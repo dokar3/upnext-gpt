@@ -44,6 +44,7 @@ import kotlin.math.sin
 fun UpNextCard(
     isRolling: Boolean,
     nextTrack: TrackInfo?,
+    playEnabled: Boolean,
     rollEnabled: Boolean,
     onPlayClick: () -> Unit,
     onRollClick: () -> Unit,
@@ -68,7 +69,7 @@ fun UpNextCard(
             Text(
                 text = "${nextTrack?.title ?: ""} - ${nextTrack?.artist ?: ""}",
                 fontSize = 18.sp,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
 
@@ -79,6 +80,7 @@ fun UpNextCard(
                 TextButton(
                     onClick = onPlayClick,
                     shape = CircleShape,
+                    enabled = playEnabled,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White.copy(alpha = 0.2f),
                         contentColor = MaterialTheme.colorScheme.onPrimary,

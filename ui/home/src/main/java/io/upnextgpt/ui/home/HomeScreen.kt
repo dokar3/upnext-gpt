@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -168,6 +169,7 @@ private fun Player(
             Text(
                 text = trackInfo?.title ?: "Not Playing",
                 fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
             )
 
             Text(text = trackInfo?.artist ?: "-")
@@ -231,6 +233,7 @@ private fun Player(
             UpNextCard(
                 isRolling = uiState.isLoadingNextTrack,
                 nextTrack = uiState.nextTrack,
+                playEnabled = uiState.nextTrack != null,
                 rollEnabled = !uiState.isLoadingNextTrack,
                 onPlayClick = { uiState.nextTrack?.let { onPlayTrack(it) } },
                 onRollClick = onFetchNextTrackClick,
