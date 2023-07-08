@@ -37,11 +37,15 @@ internal val SupportedPlayers = listOf(
 data class HomeUiState(
     val players: List<PlayerMeta> = SupportedPlayers,
     val isConnectedToPlayers: Boolean = true,
-    val trackInfo: TrackInfo? = null,
+    val currTrack: TrackInfo? = null,
     val isPlaying: Boolean = false,
     val position: Long = 0L,
     val duration: Long = 0L,
     val albumArt: Bitmap? = null,
+    val nextTrack: TrackInfo? = TrackInfo(
+        title = "Help!",
+        artist = "Beatles",
+    ),
 ) {
     val activePlayer = players.firstOrNull { it.isActive }
 }

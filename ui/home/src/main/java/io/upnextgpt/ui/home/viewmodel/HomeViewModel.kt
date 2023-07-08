@@ -3,6 +3,7 @@ package io.upnextgpt.ui.home.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.upnextgpt.base.AppLauncher
+import io.upnextgpt.base.TrackInfo
 import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.remote.palyer.PlayState
@@ -60,7 +61,7 @@ class HomeViewModel(
                     _uiState.update {
                         it.copy(
                             players = players,
-                            trackInfo = info?.toTrackInfo(),
+                            currTrack = info?.toTrackInfo(),
                             isPlaying = info?.playState == PlayState.Playing,
                             position = info?.position ?: 0L,
                             duration = info?.duration ?: 0L,
@@ -91,6 +92,16 @@ class HomeViewModel(
 
     fun seek(position: Long) {
         controlOrLunchPlayer { player.seek(position) }
+    }
+
+    fun playTrack(track: TrackInfo) {
+        val currPlayer = uiState.value.activePlayer ?: return
+        appLauncher.playTrack(
+            packageName = currPlayer.packageName,
+            title = track.title,
+            artist = track.artist,
+            album = track.album,
+        )
     }
 
     fun selectPlayer(meta: PlayerMeta) = viewModelScope.launch(dispatcher) {

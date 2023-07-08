@@ -21,8 +21,8 @@ data class PlaybackInfo(
 
 fun PlaybackInfo.toTrackInfo(): TrackInfo {
     return TrackInfo(
-        title = this.title ?: "",
-        artist = this.artist,
+        title = this.title ?: "Unknown",
+        artist = this.artist ?: "Unknown",
         album = this.album,
         albumArtist = this.albumArtist,
         duration = this.duration,

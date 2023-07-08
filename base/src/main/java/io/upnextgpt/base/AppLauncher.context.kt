@@ -15,4 +15,19 @@ class ContextAppLauncher(
     override fun lunchPackage(packageName: String) {
         IntentUtil.lunchApp(context, packageName)
     }
+
+    override fun playTrack(
+        packageName: String,
+        title: String,
+        artist: String,
+        album: String?
+    ) {
+        IntentUtil.playTrack(
+            context = context,
+            packageName = packageName,
+            title = title,
+            artist = artist,
+            album = album,
+        )
+    }
 }

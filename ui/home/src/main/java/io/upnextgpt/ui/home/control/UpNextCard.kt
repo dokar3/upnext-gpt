@@ -17,10 +17,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.upnextgpt.base.TrackInfo
 import io.upnextgpt.ui.shared.widget.CardButton
 
 @Composable
-fun UpNextCard(modifier: Modifier = Modifier) {
+fun UpNextCard(
+    nextTrack: TrackInfo?,
+    onPlayClick: () -> Unit,
+    onRollClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     CardButton(
         modifier = modifier.fillMaxWidth(),
         backgroundColor = MaterialTheme.colorScheme.secondary,
@@ -29,7 +35,7 @@ fun UpNextCard(modifier: Modifier = Modifier) {
             Text("Up Next")
 
             Text(
-                text = "Beatles - Help!",
+                text = "${nextTrack?.title} - ${nextTrack?.artist}",
                 fontSize = 18.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -40,7 +46,7 @@ fun UpNextCard(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.End,
             ) {
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = onPlayClick,
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White.copy(alpha = 0.2f),
@@ -53,7 +59,7 @@ fun UpNextCard(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.width(16.dp))
 
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = onRollClick,
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White.copy(alpha = 0.2f),

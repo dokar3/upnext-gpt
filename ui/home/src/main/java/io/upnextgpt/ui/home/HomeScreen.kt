@@ -36,6 +36,7 @@ import androidx.lifecycle.Lifecycle
 import com.dokar.sheets.rememberBottomSheetState
 import io.upnextgpt.base.ImmutableHolder
 import io.upnextgpt.base.SealedResult
+import io.upnextgpt.base.TrackInfo
 import io.upnextgpt.base.util.IntentUtil
 import io.upnextgpt.ui.home.control.CoverView
 import io.upnextgpt.ui.home.control.PlayControlCard
@@ -84,6 +85,7 @@ fun HomeScreen(
             onPause = viewModel::pause,
             onSeek = viewModel::seek,
             onSelectPlayer = viewModel::selectPlayer,
+            onPlayTrack = viewModel::playTrack,
             modifier = Modifier.padding(horizontal = 32.dp),
         )
     }
@@ -96,13 +98,14 @@ private fun Player(
     onPause: () -> Unit,
     onSeek: (position: Long) -> Unit,
     onSelectPlayer: (meta: PlayerMeta) -> Unit,
+    onPlayTrack: (track: TrackInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
     val currPlayer = uiState.activePlayer
 
-    val trackInfo = uiState.trackInfo
+    val trackInfo = uiState.currTrack
 
     val scope = rememberCoroutineScope()
 
@@ -191,7 +194,11 @@ private fun Player(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            UpNextCard()
+            UpNextCard(
+                nextTrack = uiState.nextTrack,
+                onPlayClick = { uiState.nextTrack?.let { onPlayTrack(it) } },
+                onRollClick = {},
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
         }
