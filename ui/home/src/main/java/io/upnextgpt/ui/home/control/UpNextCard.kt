@@ -46,6 +46,7 @@ fun UpNextCard(
     nextTrack: Track?,
     playEnabled: Boolean,
     rollEnabled: Boolean,
+    onClick: () -> Unit,
     onPlayClick: () -> Unit,
     onRollClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -55,6 +56,7 @@ fun UpNextCard(
             .fillMaxWidth(),
         backgroundColor = MaterialTheme.colorScheme.secondary,
         padding = PaddingValues(0.dp),
+        onClick = onClick,
     ) {
         Column(
             modifier = Modifier

@@ -92,10 +92,21 @@ class HomeViewModel(
             .filterNotNull()
             .distinctUntilChangedBy { it.title + it.artist }
             .collect { currTrack ->
-                _playerQueue.update { listOf(currTrack) + it }
+                addTrackToQueue(currTrack)
                 trackRepo.save(currTrack)
                 fetchNextTrack()
             }
+    }
+
+    private fun addTrackToQueue(track: Track) {
+        val list = playerQueue.value.toMutableList()
+        val idx = list.indexOfFirst { it.id == track.id }
+        if (idx != -1) {
+            list[idx] = track
+        } else {
+            list.add(0, track)
+        }
+        _playerQueue.update { list }
     }
 
     private fun listenNextTrack() = viewModelScope.launch(dispatcher) {

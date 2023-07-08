@@ -1,5 +1,9 @@
 package com.dokar.upnextgpt
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -8,9 +12,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.upnextgpt.ui.home.HomeScreen
+import io.upnextgpt.ui.home.QueueScreen
+import io.upnextgpt.ui.home.viewmodel.HomeViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AppNavGraph(modifier: Modifier = Modifier) {
+fun AppNavGraph(
+    modifier: Modifier = Modifier,
+    homeViewModel: HomeViewModel = koinViewModel(),
+) {
     val navController = rememberNavController()
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -18,8 +28,34 @@ fun AppNavGraph(modifier: Modifier = Modifier) {
             navController = navController,
             startDestination = "home",
         ) {
-            composable(route = "home") {
-                HomeScreen()
+            composable(
+                route = "home",
+                exitTransition = {
+                    scaleOut(targetScale = 0.8f) + fadeOut()
+                },
+                popEnterTransition = {
+                    scaleIn(initialScale = 0.8f) + fadeIn()
+                },
+            ) {
+                HomeScreen(
+                    viewModel = homeViewModel,
+                    onNavigate = { navController.navigate(it) },
+                )
+            }
+
+            composable(
+                route = "queue",
+                enterTransition = {
+                    scaleIn(initialScale = 1.2f) + fadeIn()
+                },
+                exitTransition = {
+                    scaleOut(targetScale = 1.2f) + fadeOut()
+                },
+            ) {
+                QueueScreen(
+                    viewModel = homeViewModel,
+                    onBack = { navController.popBackStack() },
+                )
             }
         }
     }

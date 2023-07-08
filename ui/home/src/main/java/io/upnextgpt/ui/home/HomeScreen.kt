@@ -32,12 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import com.dokar.sheets.rememberBottomSheetState
 import io.upnextgpt.base.ImmutableHolder
+import io.upnextgpt.base.R
 import io.upnextgpt.base.SealedResult
 import io.upnextgpt.base.util.IntentUtil
 import io.upnextgpt.data.model.Track
@@ -57,12 +59,12 @@ import io.upnextgpt.ui.shared.widget.TypedSnackbarVisuals
 import io.upnextgpt.ui.shared.widget.snackbarShimmerBorder
 import io.upnextgpt.ui.shared.widget.typedBorderColorOrNull
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
+    viewModel: HomeViewModel,
+    onNavigate: (route: String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -85,7 +87,10 @@ fun HomeScreen(
             )
         }
 
-        TitleBar(modifier = Modifier.padding(horizontal = 32.dp))
+        TitleBar(
+            title = stringResource(R.string.app_name),
+            modifier = Modifier.padding(horizontal = 32.dp),
+        )
 
         Player(
             uiState = uiState,
@@ -96,6 +101,7 @@ fun HomeScreen(
             onPlayTrack = viewModel::playTrack,
             onClearError = viewModel::clearError,
             onFetchNextTrackClick = viewModel::fetchNextTrack,
+            onNavigate = onNavigate,
             modifier = Modifier.padding(horizontal = 32.dp),
         )
     }
@@ -111,6 +117,7 @@ private fun Player(
     onPlayTrack: (track: Track) -> Unit,
     onFetchNextTrackClick: () -> Unit,
     onClearError: () -> Unit,
+    onNavigate: (route: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -235,6 +242,7 @@ private fun Player(
                 nextTrack = uiState.nextTrack,
                 playEnabled = uiState.nextTrack != null,
                 rollEnabled = !uiState.isLoadingNextTrack,
+                onClick = { onNavigate("queue") },
                 onPlayClick = { uiState.nextTrack?.let { onPlayTrack(it) } },
                 onRollClick = onFetchNextTrackClick,
             )

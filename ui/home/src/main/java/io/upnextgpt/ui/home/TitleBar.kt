@@ -1,32 +1,60 @@
 package io.upnextgpt.ui.home
 
-import io.upnextgpt.base.R as BaseR
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.upnextgpt.ui.shared.R as SharedR
 
 @Composable
-internal fun TitleBar(modifier: Modifier = Modifier) {
+internal fun TitleBar(
+    title: String,
+    modifier: Modifier = Modifier,
+    showBack: Boolean = false,
+    onBack: (() -> Unit)? = null,
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Box(
+            modifier = Modifier.size(56.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (showBack) {
+                IconButton(onClick = { onBack?.invoke() }) {
+                    Icon(
+                        painter = painterResource(
+                            SharedR.drawable.baseline_keyboard_backspace_24
+                        ),
+                        contentDescription = "Back",
+                    )
+                }
+            }
+        }
+
         Text(
-            text = stringResource(BaseR.string.app_name),
+            text = title,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
         )
+
+        Box(modifier = Modifier.width(56.dp))
     }
 }
