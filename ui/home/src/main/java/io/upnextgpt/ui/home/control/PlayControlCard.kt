@@ -16,6 +16,8 @@ import io.upnextgpt.ui.shared.widget.CardButton
 @Composable
 fun PlayControlCard(
     isPlaying: Boolean,
+    prevEnabled: Boolean,
+    nextEnabled: Boolean,
     onPrevClick: () -> Unit,
     onPlayPauseClick: () -> Unit,
     onNextClick: () -> Unit,
@@ -26,7 +28,7 @@ fun PlayControlCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            IconButton(onClick = onPrevClick) {
+            IconButton(onClick = onPrevClick, enabled = prevEnabled) {
                 Icon(
                     painter = painterResource(R.drawable.outline_skip_previous_24),
                     contentDescription = "",
@@ -45,7 +47,7 @@ fun PlayControlCard(
                     modifier = Modifier.size(28.dp),
                 )
             }
-            IconButton(onClick = onNextClick) {
+            IconButton(onClick = onNextClick, enabled = nextEnabled) {
                 Icon(
                     painter = painterResource(R.drawable.outline_skip_next_24),
                     contentDescription = "",

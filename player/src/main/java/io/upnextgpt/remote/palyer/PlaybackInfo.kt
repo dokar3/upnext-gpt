@@ -2,7 +2,7 @@ package io.upnextgpt.remote.palyer
 
 import android.graphics.Bitmap
 import android.media.session.MediaSession
-import io.upnextgpt.base.TrackInfo
+import io.upnextgpt.data.model.TrackInfo
 
 data class PlaybackInfo(
     val mediaSession: MediaSession.Token,

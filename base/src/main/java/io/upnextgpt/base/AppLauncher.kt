@@ -3,7 +3,7 @@ package io.upnextgpt.base
 interface AppLauncher {
     fun isInstalled(packageName: String): Boolean
 
-    fun lunchPackage(packageName: String)
+    fun launchPackage(packageName: String)
 
     fun playTrack(
         packageName: String,

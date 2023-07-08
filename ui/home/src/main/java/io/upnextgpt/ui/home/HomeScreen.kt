@@ -16,11 +16,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,8 +38,8 @@ import androidx.lifecycle.Lifecycle
 import com.dokar.sheets.rememberBottomSheetState
 import io.upnextgpt.base.ImmutableHolder
 import io.upnextgpt.base.SealedResult
-import io.upnextgpt.base.TrackInfo
 import io.upnextgpt.base.util.IntentUtil
+import io.upnextgpt.data.model.TrackInfo
 import io.upnextgpt.ui.home.control.CoverView
 import io.upnextgpt.ui.home.control.PlayControlCard
 import io.upnextgpt.ui.home.control.PlayerCard
@@ -47,7 +49,12 @@ import io.upnextgpt.ui.home.viewmodel.HomeUiState
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.home.viewmodel.PlayerMeta
 import io.upnextgpt.ui.shared.compose.rememberLifecycleEvent
+import io.upnextgpt.ui.shared.widget.SnackbarType
 import io.upnextgpt.ui.shared.widget.SpringDragBox
+import io.upnextgpt.ui.shared.widget.SwipeableSnackbar
+import io.upnextgpt.ui.shared.widget.TypedSnackbarVisuals
+import io.upnextgpt.ui.shared.widget.snackbarShimmerBorder
+import io.upnextgpt.ui.shared.widget.typedBorderColorOrNull
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -86,6 +93,8 @@ fun HomeScreen(
             onSeek = viewModel::seek,
             onSelectPlayer = viewModel::selectPlayer,
             onPlayTrack = viewModel::playTrack,
+            onClearError = viewModel::clearError,
+            onFetchNextTrackClick = viewModel::fetchNextTrack,
             modifier = Modifier.padding(horizontal = 32.dp),
         )
     }
@@ -99,6 +108,8 @@ private fun Player(
     onSeek: (position: Long) -> Unit,
     onSelectPlayer: (meta: PlayerMeta) -> Unit,
     onPlayTrack: (track: TrackInfo) -> Unit,
+    onFetchNextTrackClick: () -> Unit,
+    onClearError: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -114,6 +125,23 @@ private fun Player(
     val scrollState = rememberScrollState()
 
     val playerSelectorSheetState = rememberBottomSheetState()
+
+    LaunchedEffect(uiState.error) {
+        if (uiState.error != null) {
+            snackBarHostState.showSnackbar(
+                visuals = TypedSnackbarVisuals(
+                    type = SnackbarType.Error,
+                    message = uiState.error,
+                    withDismissAction = true,
+                ),
+            )
+            onClearError()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { onClearError() }
+    }
 
     SpringDragBox(modifier = modifier.fillMaxSize()) {
         Column(
@@ -162,7 +190,7 @@ private fun Player(
                         val packageName = currPlayer?.packageName
                             ?: return@PlayerCard
                         when (val ret =
-                            IntentUtil.lunchApp(context, packageName)) {
+                            IntentUtil.launchApp(context, packageName)) {
                             is SealedResult.Err -> scope.launch {
                                 snackBarHostState
                                     .showSnackbar(
@@ -179,6 +207,8 @@ private fun Player(
 
                 PlayControlCard(
                     isPlaying = uiState.isPlaying,
+                    prevEnabled = true,
+                    nextEnabled = uiState.nextTrack != null,
                     onPrevClick = {},
                     onPlayPauseClick = {
                         if (uiState.isPlaying) {
@@ -187,7 +217,11 @@ private fun Player(
                             onPlay()
                         }
                     },
-                    onNextClick = {},
+                    onNextClick = {
+                        if (uiState.nextTrack != null) {
+                            onPlayTrack(uiState.nextTrack)
+                        }
+                    },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -197,8 +231,9 @@ private fun Player(
             UpNextCard(
                 isRolling = uiState.isLoadingNextTrack,
                 nextTrack = uiState.nextTrack,
+                rollEnabled = !uiState.isLoadingNextTrack,
                 onPlayClick = { uiState.nextTrack?.let { onPlayTrack(it) } },
-                onRollClick = {},
+                onRollClick = onFetchNextTrackClick,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -207,7 +242,23 @@ private fun Player(
         SnackbarHost(
             hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
-        )
+        ) {
+            val contentColor = MaterialTheme.colorScheme.onBackground
+            val borderShape = SnackbarDefaults.shape
+            SwipeableSnackbar(
+                snackbarData = it,
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .snackbarShimmerBorder(
+                        color = it.visuals.typedBorderColorOrNull()
+                            ?: contentColor,
+                        shape = borderShape,
+                    ),
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = contentColor,
+                dismissActionContentColor = contentColor,
+            )
+        }
     }
 
     PlayerSelectorSheet(

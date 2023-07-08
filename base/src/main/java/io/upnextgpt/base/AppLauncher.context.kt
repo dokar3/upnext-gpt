@@ -12,8 +12,8 @@ class ContextAppLauncher(
         return IntentUtil.isPackageInstalled(context, packageName)
     }
 
-    override fun lunchPackage(packageName: String) {
-        IntentUtil.lunchApp(context, packageName)
+    override fun launchPackage(packageName: String) {
+        IntentUtil.launchApp(context, packageName)
     }
 
     override fun playTrack(

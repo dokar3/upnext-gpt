@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import io.upnextgpt.ui.shared.R
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import io.upnextgpt.base.TrackInfo
+import io.upnextgpt.data.model.TrackInfo
 
 internal val SupportedPlayers = listOf(
     PlayerMeta(
@@ -44,6 +44,7 @@ data class HomeUiState(
     val albumArt: Bitmap? = null,
     val nextTrack: TrackInfo? = null,
     val isLoadingNextTrack: Boolean = false,
+    val error: String? = null,
 ) {
     val activePlayer = players.firstOrNull { it.isActive }
 }

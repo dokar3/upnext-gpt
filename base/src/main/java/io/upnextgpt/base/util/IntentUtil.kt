@@ -17,7 +17,7 @@ object IntentUtil {
         }
     }
 
-    fun lunchApp(
+    fun launchApp(
         context: Context,
         packageName: String
     ): SealedResult<Unit, String> {
@@ -26,13 +26,13 @@ object IntentUtil {
                 .getLaunchIntentForPackage(packageName)
                 ?.apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
             require(intent != null) {
-                "Lunch intent not found for package '$packageName'"
+                "Launch intent not found for package '$packageName'"
             }
             context.startActivity(intent)
-            SealedResult.Ok(null)
+            SealedResult.Ok(Unit)
         } catch (e: Exception) {
-            Logger.e(this::class.simpleName!!, "Cannot lunch app: $e")
-            SealedResult.Err("Cannot lunch app.")
+            Logger.e(this::class.simpleName!!, "Cannot launch app: $e")
+            SealedResult.Err("Cannot launch app.")
         }
     }
 

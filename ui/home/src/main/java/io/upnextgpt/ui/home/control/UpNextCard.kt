@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.upnextgpt.base.TrackInfo
+import io.upnextgpt.data.model.TrackInfo
 import io.upnextgpt.ui.shared.widget.CardButton
 import kotlin.math.cos
 import kotlin.math.sin
@@ -44,6 +44,7 @@ import kotlin.math.sin
 fun UpNextCard(
     isRolling: Boolean,
     nextTrack: TrackInfo?,
+    rollEnabled: Boolean,
     onPlayClick: () -> Unit,
     onRollClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -65,7 +66,7 @@ fun UpNextCard(
             Text("Up Next")
 
             Text(
-                text = "${nextTrack?.title} - ${nextTrack?.artist}",
+                text = "${nextTrack?.title ?: ""} - ${nextTrack?.artist ?: ""}",
                 fontSize = 18.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -94,7 +95,10 @@ fun UpNextCard(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White.copy(alpha = 0.2f),
                         contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContentColor = MaterialTheme.colorScheme
+                            .onPrimary.copy(alpha = 0.5f),
                     ),
+                    enabled = rollEnabled,
                 ) {
                     Text("Roll!")
                 }

@@ -3,7 +3,9 @@ package io.upnextgpt.ui.home.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.upnextgpt.base.AppLauncher
-import io.upnextgpt.base.TrackInfo
+import io.upnextgpt.base.SealedResult
+import io.upnextgpt.data.fetcher.NextTrackFetcher
+import io.upnextgpt.data.model.TrackInfo
 import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.remote.palyer.PlayState
@@ -13,6 +15,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -20,24 +25,29 @@ class HomeViewModel(
     private val player: NotificationBasedPlayer,
     private val settings: Settings,
     private val appLauncher: AppLauncher,
+    private val nextTrackFetcher: NextTrackFetcher,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
     private var playerListenJob: Job? = null
-
-    private val _uiState = MutableStateFlow(HomeUiState())
+    private var fetchNextTrackJob: Job? = null
 
     private var playerList = SupportedPlayers
 
+    private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState
+
+    private val _playerQueue = MutableStateFlow<List<TrackInfo>>(emptyList())
+    val playerQueue: StateFlow<List<TrackInfo>> = _playerQueue
 
     init {
         updatePlayerList()
         updatePlayerConnectionStatus()
-        listenCurrPlayerChanges()
+        listenCurrPlayer()
         listenPlaybackUpdates()
+        listenCurrTrack()
     }
 
-    private fun listenCurrPlayerChanges() = viewModelScope.launch(dispatcher) {
+    private fun listenCurrPlayer() = viewModelScope.launch(dispatcher) {
         settings.currentPlayerFlow.collect { currPlayer ->
             player.updateTargetPlayer(packageName = currPlayer)
             val players = playerList.map {
@@ -72,6 +82,16 @@ class HomeViewModel(
         }
     }
 
+    private fun listenCurrTrack() = viewModelScope.launch(dispatcher) {
+        uiState.map { it.currTrack }
+            .filterNotNull()
+            .distinctUntilChangedBy { it.title + it.artist }
+            .collect { currTrack ->
+                _playerQueue.update { it + listOf(currTrack) }
+                fetchNextTrack()
+            }
+    }
+
     fun updatePlayerConnectionStatus() = viewModelScope.launch(dispatcher) {
         _uiState.update {
             it.copy(isConnectedToPlayers = player.isConnected())
@@ -83,15 +103,15 @@ class HomeViewModel(
     }
 
     fun pause() {
-        controlOrLunchPlayer { player.pause() }
+        controlOrLaunchPlayer { player.pause() }
     }
 
     fun play() {
-        controlOrLunchPlayer { player.play() }
+        controlOrLaunchPlayer { player.play() }
     }
 
     fun seek(position: Long) {
-        controlOrLunchPlayer { player.seek(position) }
+        controlOrLaunchPlayer { player.seek(position) }
     }
 
     fun playTrack(track: TrackInfo) {
@@ -110,6 +130,38 @@ class HomeViewModel(
             return@launch
         }
         settings.updateCurrentPlayer(meta.packageName)
+    }
+
+    fun clearError() {
+        _uiState.update { it.copy(error = null) }
+    }
+
+    fun fetchNextTrack() {
+        fetchNextTrackJob?.cancel()
+        fetchNextTrackJob = viewModelScope.launch(dispatcher) {
+            _uiState.update {
+                it.copy(
+                    isLoadingNextTrack = true,
+                    error = null,
+                )
+            }
+            val queue = playerQueue.value
+            when (val ret = nextTrackFetcher.fetch(queue)) {
+                is SealedResult.Err -> _uiState.update {
+                    it.copy(
+                        isLoadingNextTrack = false,
+                        error = ret.error.message,
+                    )
+                }
+
+                is SealedResult.Ok -> _uiState.update {
+                    it.copy(
+                        isLoadingNextTrack = false,
+                        nextTrack = ret.data,
+                    )
+                }
+            }
+        }
     }
 
     private fun updatePlayerList() = viewModelScope.launch(dispatcher) {
@@ -131,13 +183,13 @@ class HomeViewModel(
         }
     }
 
-    private inline fun controlOrLunchPlayer(action: () -> Unit) {
+    private inline fun controlOrLaunchPlayer(action: () -> Unit) {
         if (player.isControllable()) {
             action()
         } else {
             val activePlayer = uiState.value.activePlayer
             if (activePlayer != null) {
-                appLauncher.lunchPackage(activePlayer.packageName)
+                appLauncher.launchPackage(activePlayer.packageName)
             }
         }
     }
