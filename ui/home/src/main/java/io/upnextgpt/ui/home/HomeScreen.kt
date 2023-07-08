@@ -1,6 +1,5 @@
 package io.upnextgpt.ui.home
 
-import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -34,7 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dokar.sheets.rememberBottomSheetState
 import io.upnextgpt.base.ImmutableHolder
 import io.upnextgpt.base.SealedResult
@@ -50,15 +48,12 @@ import io.upnextgpt.ui.home.viewmodel.PlayerMeta
 import io.upnextgpt.ui.shared.compose.rememberLifecycleEvent
 import io.upnextgpt.ui.shared.widget.SpringDragBox
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel(
-        factory = HomeViewModel.Factory(
-            application = (LocalContext.current as Activity).application,
-        ),
-    )
+    viewModel: HomeViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

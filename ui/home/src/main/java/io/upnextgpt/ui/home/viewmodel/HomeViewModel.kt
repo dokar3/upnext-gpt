@@ -1,11 +1,8 @@
 package io.upnextgpt.ui.home.viewmodel
 
-import android.app.Application
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import io.upnextgpt.base.util.IntentUtil
+import io.upnextgpt.base.AppLauncher
 import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.remote.palyer.PlayState
@@ -19,15 +16,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val application: Application,
+    private val player: NotificationBasedPlayer,
+    private val settings: Settings,
+    private val appLauncher: AppLauncher,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
-    private val context: Context get() = application.applicationContext
-
-    private val settings = Settings.getInstance(context)
-
-    private val player = NotificationBasedPlayer(context)
-
     private var playerListenJob: Job? = null
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -109,10 +102,8 @@ class HomeViewModel(
     }
 
     private fun updatePlayerList() = viewModelScope.launch(dispatcher) {
-        val ctx = context
         val newList = SupportedPlayers.map {
-            val installed = IntentUtil.isPackageInstalled(ctx, it.packageName)
-            it.copy(isInstalled = installed)
+            it.copy(isInstalled = appLauncher.isInstalled(it.packageName))
         }
         if (newList != playerList) {
             playerList = newList
@@ -135,7 +126,7 @@ class HomeViewModel(
         } else {
             val activePlayer = uiState.value.activePlayer
             if (activePlayer != null) {
-                IntentUtil.lunchApp(context, activePlayer.packageName)
+                appLauncher.lunchPackage(activePlayer.packageName)
             }
         }
     }
@@ -143,16 +134,5 @@ class HomeViewModel(
     override fun onCleared() {
         super.onCleared()
         player.destroy()
-    }
-
-    class Factory(
-        private val application: Application
-    ) : ViewModelProvider.Factory {
-        @Suppress("unchecked_cast")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return HomeViewModel(
-                application = application,
-            ) as T
-        }
     }
 }

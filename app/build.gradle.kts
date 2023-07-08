@@ -49,6 +49,8 @@ android {
 
 dependencies {
     implementation(projects.base)
+    implementation(projects.data)
+    implementation(projects.player)
     implementation(projects.ui.shared)
     implementation(projects.ui.home)
 

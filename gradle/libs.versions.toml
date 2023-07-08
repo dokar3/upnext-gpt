@@ -15,8 +15,9 @@ appcompat = "1.6.1"
 material = "1.9.0"
 lifecycleViewmodelKtx = "2.6.1"
 lifecycleCommon = "2.6.1"
-dataStore="1.0.0"
+dataStore = "1.0.0"
 sheets = "0.4.3"
+koinCompose = "3.4.5"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -42,6 +43,7 @@ androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "l
 androidx-lifecycle-common = { group = "androidx.lifecycle", name = "lifecycle-common", version.ref = "lifecycleCommon" }
 androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
 sheets = { group = "io.github.dokar3", name = "sheets", version.ref = "sheets" }
+koin = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinCompose" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

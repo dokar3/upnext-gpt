@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.map
 val Context.dataStore: DataStore<Preferences>
         by preferencesDataStore(name = "settings")
 
-class Settings private constructor(
-    private val dataStore: DataStore<Preferences>
-) {
+class Settings(private val dataStore: DataStore<Preferences>) {
     private val currentPlayerKey = stringPreferencesKey("current_player")
 
     val currentPlayerFlow: Flow<String?> = dataStore.data
@@ -26,19 +24,6 @@ class Settings private constructor(
                 it.remove(currentPlayerKey)
             } else {
                 it[currentPlayerKey] = value
-            }
-        }
-    }
-
-    companion object {
-        @Volatile
-        private var instance: Settings? = null
-
-        fun getInstance(context: Context): Settings {
-            return instance ?: synchronized(Settings::class) {
-                instance ?: Settings(
-                    dataStore = context.applicationContext.dataStore,
-                ).also { instance = it }
             }
         }
     }
