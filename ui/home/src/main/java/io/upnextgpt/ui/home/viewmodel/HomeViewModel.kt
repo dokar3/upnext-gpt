@@ -1,5 +1,6 @@
 package io.upnextgpt.ui.home.viewmodel
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.upnextgpt.base.AppLauncher
@@ -12,7 +13,7 @@ import io.upnextgpt.data.repository.TrackRepository
 import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.remote.palyer.PlayState
-import io.upnextgpt.remote.palyer.toTrackInfo
+import io.upnextgpt.remote.palyer.toTrack
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,7 +35,6 @@ class HomeViewModel(
     private val diskImageStore: DiskImageStore,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
-    private var playerListenJob: Job? = null
     private var fetchNextTrackJob: Job? = null
 
     private var playerList = SupportedPlayers
@@ -68,26 +68,32 @@ class HomeViewModel(
         }
     }
 
-    private fun listenPlaybackStates() {
-        playerListenJob?.cancel()
-        playerListenJob = viewModelScope.launch(dispatcher) {
-            player.prepare()
-            player.playbackInfoFlow().collect { info ->
-                val packageName = info?.packageName
-                    ?: uiState.value.activePlayer?.packageName
-                val players = playerList.map {
-                    it.copy(isActive = packageName == it.packageName)
-                }
-                _uiState.update {
-                    it.copy(
-                        players = players,
-                        currTrack = info?.toTrackInfo(),
-                        isPlaying = info?.playState == PlayState.Playing,
-                        position = info?.position ?: 0L,
-                        duration = info?.duration ?: 0L,
-                        albumArt = info?.albumArt,
-                    )
-                }
+    private fun listenPlaybackStates() = viewModelScope.launch(dispatcher) {
+        player.prepare()
+        player.playbackInfoFlow().collect { info ->
+            val packageName = info?.packageName
+                ?: uiState.value.activePlayer?.packageName
+            val players = playerList.map {
+                it.copy(isActive = packageName == it.packageName)
+            }
+            val currTrack = info?.toTrack()
+            _uiState.update {
+                it.copy(
+                    players = players,
+                    currTrack = currTrack,
+                    isPlaying = info?.playState == PlayState.Playing,
+                    position = info?.position ?: 0L,
+                    duration = info?.duration ?: 0L,
+                    albumArt = info?.albumArt,
+                )
+            }
+
+            if (currTrack != null) {
+                updateDiskAlbumArt(
+                    track = currTrack,
+                    bitmap = info.albumArt,
+                    alwaysUpdate = false,
+                )
             }
         }
     }
@@ -100,16 +106,7 @@ class HomeViewModel(
                 addTrackToQueue(currTrack)
                 trackRepo.save(currTrack)
                 fetchNextTrack()
-                // Update local album art
-                val albumArt = uiState.value.albumArt
-                if (albumArt != null) {
-                    diskImageStore.save(
-                        bitmap = albumArt,
-                        key = currTrack.id.toString(),
-                    )
-                } else {
-                    diskImageStore.delete(currTrack.id.toString())
-                }
+                updateDiskAlbumArt(currTrack, uiState.value.albumArt)
             }
     }
 
@@ -139,6 +136,24 @@ class HomeViewModel(
         val nextTrackId = settings.nextTrackIdFlow.firstOrNull()
         val nextTrack = list.find { it.id == nextTrackId }
         _uiState.update { it.copy(nextTrack = nextTrack) }
+    }
+
+    private fun updateDiskAlbumArt(
+        track: Track,
+        bitmap: Bitmap?,
+        alwaysUpdate: Boolean = true,
+    ) = viewModelScope.launch(dispatcher) {
+        val key = track.id.toString()
+        if (bitmap != null) {
+            if (alwaysUpdate || !diskImageStore.exists(key)) {
+                diskImageStore.save(
+                    bitmap = bitmap,
+                    key = track.id.toString(),
+                )
+            }
+        } else {
+            diskImageStore.delete(key)
+        }
     }
 
     fun updatePlayerConnectionStatus() = viewModelScope.launch(dispatcher) {

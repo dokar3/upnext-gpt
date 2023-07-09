@@ -22,14 +22,18 @@ class DiskImageStore(
         MAX_CACHE_SIZE
     )
 
+    suspend fun exists(key: String): Boolean = withContext(dispatcher) {
+        diskCache.get(key) != null
+    }
+
     suspend fun save(
         bitmap: Bitmap,
         key: String,
         quality: Int = 85,
     ) = withContext(dispatcher) {
         diskCache.edit(key).let {
-            it.newOutputStream(0).use {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, it)
+            it.newOutputStream(0)?.use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)
             }
             it.commit()
         }

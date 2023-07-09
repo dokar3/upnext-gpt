@@ -19,7 +19,7 @@ data class PlaybackInfo(
     val albumArt: Bitmap?,
 )
 
-fun PlaybackInfo.toTrackInfo(): Track {
+fun PlaybackInfo.toTrack(): Track {
     return Track(
         title = this.title ?: "Unknown",
         artist = this.artist ?: "Unknown",
