@@ -16,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -52,12 +51,10 @@ import io.upnextgpt.ui.home.viewmodel.HomeUiState
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.home.viewmodel.PlayerMeta
 import io.upnextgpt.ui.shared.compose.rememberLifecycleEvent
+import io.upnextgpt.ui.shared.widget.ShimmerBorderSnackbar
 import io.upnextgpt.ui.shared.widget.SnackbarType
 import io.upnextgpt.ui.shared.widget.SpringDragBox
-import io.upnextgpt.ui.shared.widget.SwipeableSnackbar
 import io.upnextgpt.ui.shared.widget.TypedSnackbarVisuals
-import io.upnextgpt.ui.shared.widget.snackbarShimmerBorder
-import io.upnextgpt.ui.shared.widget.typedBorderColorOrNull
 import kotlinx.coroutines.launch
 
 @Composable
@@ -254,21 +251,7 @@ private fun Player(
             hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
         ) {
-            val contentColor = MaterialTheme.colorScheme.onBackground
-            val borderShape = SnackbarDefaults.shape
-            SwipeableSnackbar(
-                snackbarData = it,
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .snackbarShimmerBorder(
-                        color = it.visuals.typedBorderColorOrNull()
-                            ?: contentColor,
-                        shape = borderShape,
-                    ),
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = contentColor,
-                dismissActionContentColor = contentColor,
-            )
+            ShimmerBorderSnackbar(snackbarData = it)
         }
     }
 

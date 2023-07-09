@@ -1,5 +1,6 @@
 package com.dokar.upnextgpt
 
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -31,7 +32,12 @@ fun AppNavGraph(
             composable(
                 route = "home",
                 exitTransition = {
-                    scaleOut(targetScale = 0.8f) + fadeOut()
+                    scaleOut(
+                        targetScale = 0.8f,
+                        animationSpec = tween(durationMillis = 225),
+                    ) + fadeOut(
+                        animationSpec = tween(durationMillis = 225),
+                    )
                 },
                 popEnterTransition = {
                     scaleIn(initialScale = 0.8f) + fadeIn()
@@ -46,10 +52,20 @@ fun AppNavGraph(
             composable(
                 route = "queue",
                 enterTransition = {
-                    scaleIn(initialScale = 1.2f) + fadeIn()
+                    scaleIn(
+                        initialScale = 1.2f,
+                        animationSpec = tween(durationMillis = 300),
+                    ) + fadeIn(
+                        animationSpec = tween(durationMillis = 300),
+                    )
                 },
                 exitTransition = {
-                    scaleOut(targetScale = 1.2f) + fadeOut()
+                    scaleOut(
+                        targetScale = 1.2f,
+                        animationSpec = tween(durationMillis = 225),
+                    ) + fadeOut(
+                        animationSpec = tween(durationMillis = 225),
+                    )
                 },
             ) {
                 QueueScreen(

@@ -1,10 +1,10 @@
 package io.upnextgpt.ui.home.viewmodel
 
 import android.graphics.Bitmap
-import io.upnextgpt.ui.shared.R
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import io.upnextgpt.data.model.Track
+import io.upnextgpt.ui.shared.R
 
 internal val SupportedPlayers = listOf(
     PlayerMeta(
@@ -48,3 +48,9 @@ data class HomeUiState(
 ) {
     val activePlayer = players.firstOrNull { it.isActive }
 }
+
+@Immutable
+data class RemovedTrack(
+    val index: Int,
+    val data: Track,
+)

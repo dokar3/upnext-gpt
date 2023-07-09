@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.sheets)
+    implementation(libs.swipe)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

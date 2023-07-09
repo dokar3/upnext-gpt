@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,7 +49,10 @@ internal fun PlayerCard(
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             if (iconRes != 0) {
-                PlayerIcon(iconRes = iconRes)
+                PlayerIcon(
+                    iconRes = iconRes,
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                )
             }
 
             Column(
@@ -80,7 +82,7 @@ internal fun PlayerCard(
 }
 
 @Composable
-private fun BoxScope.PlayerIcon(
+private fun PlayerIcon(
     iconRes: Int,
     modifier: Modifier = Modifier,
 ) {
@@ -89,7 +91,6 @@ private fun BoxScope.PlayerIcon(
         contentDescription = null,
         colorFilter = ColorFilter.tint(Color.White),
         modifier = modifier
-            .align(Alignment.CenterEnd)
             .size(48.dp)
             .graphicsLayer {
                 scaleX = 1.5f

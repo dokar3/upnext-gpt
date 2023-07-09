@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.upnextgpt.base.AppLauncher
 import io.upnextgpt.base.SealedResult
+import io.upnextgpt.base.util.remove
 import io.upnextgpt.data.fetcher.NextTrackFetcher
 import io.upnextgpt.data.model.Track
 import io.upnextgpt.data.repository.TrackRepository
@@ -41,6 +42,9 @@ class HomeViewModel(
 
     private val _playerQueue = MutableStateFlow<List<Track>>(emptyList())
     val playerQueue: StateFlow<List<Track>> = _playerQueue
+
+    private val _removedTrack = MutableStateFlow<RemovedTrack?>(null)
+    val removedTrack: StateFlow<RemovedTrack?> = _removedTrack
 
     init {
         loadQueue()
@@ -156,6 +160,29 @@ class HomeViewModel(
             artist = track.artist,
             album = track.album,
         )
+    }
+
+    fun removeTrackFromQueue(track: Track) = viewModelScope.launch(dispatcher) {
+        trackRepo.delete(track.id)
+        val list = playerQueue.value.toMutableList()
+        val index = list.remove { it.id == track.id }
+        if (index != null) {
+            _playerQueue.update { list }
+            _removedTrack.update { RemovedTrack(index = index, data = track) }
+        }
+    }
+
+    fun insertTrackToQueue(track: Track, index: Int) = viewModelScope.launch(
+        dispatcher
+    ) {
+        trackRepo.save(track)
+        val list = playerQueue.value.toMutableList()
+        list.add(index.coerceIn(0, list.size), track)
+        _playerQueue.update { list }
+    }
+
+    fun clearRemovedTrack() {
+        _removedTrack.update { null }
     }
 
     fun selectPlayer(meta: PlayerMeta) = viewModelScope.launch(dispatcher) {

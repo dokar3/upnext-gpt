@@ -5,11 +5,13 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarDuration
@@ -85,6 +87,30 @@ fun Modifier.snackbarShimmerBorder(
             )
         }
     }
+}
+
+@Composable
+fun ShimmerBorderSnackbar(
+    snackbarData: SnackbarData,
+    modifier: Modifier = Modifier,
+) {
+    val contentColor = MaterialTheme.colorScheme.onBackground
+    val borderShape = SnackbarDefaults.shape
+    SwipeableSnackbar(
+        snackbarData = snackbarData,
+        modifier = modifier
+            .padding(vertical = 16.dp)
+            .snackbarShimmerBorder(
+                color = snackbarData.visuals.typedBorderColorOrNull()
+                    ?: contentColor,
+                shape = borderShape,
+            ),
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = contentColor,
+        actionColor = contentColor,
+        actionContentColor = contentColor,
+        dismissActionContentColor = contentColor,
+    )
 }
 
 @Composable

@@ -75,7 +75,10 @@ internal fun PlayerSelectorSheet(
                 }
             }
 
-            items(items = items.value) {
+            items(
+                items = items.value,
+                key = { it.packageName },
+            ) {
                 PlayerItem(
                     item = it,
                     onSelect = { onSelect(it) },
