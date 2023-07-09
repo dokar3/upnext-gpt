@@ -51,7 +51,7 @@ class HomeViewModel(
         updatePlayerList()
         updatePlayerConnectionStatus()
         listenCurrPlayer()
-        listenPlaybackUpdates()
+        listenPlaybackStates()
         listenCurrTrack()
         listenNextTrack()
     }
@@ -66,28 +66,27 @@ class HomeViewModel(
         }
     }
 
-    private fun listenPlaybackUpdates() {
+    private fun listenPlaybackStates() {
         playerListenJob?.cancel()
         playerListenJob = viewModelScope.launch(dispatcher) {
             player.prepare()
-            player.playbackInfoFlow()
-                .collect { info ->
-                    val packageName = info?.packageName
-                        ?: uiState.value.activePlayer?.packageName
-                    val players = playerList.map {
-                        it.copy(isActive = packageName == it.packageName)
-                    }
-                    _uiState.update {
-                        it.copy(
-                            players = players,
-                            currTrack = info?.toTrackInfo(),
-                            isPlaying = info?.playState == PlayState.Playing,
-                            position = info?.position ?: 0L,
-                            duration = info?.duration ?: 0L,
-                            albumArt = info?.albumArt,
-                        )
-                    }
+            player.playbackInfoFlow().collect { info ->
+                val packageName = info?.packageName
+                    ?: uiState.value.activePlayer?.packageName
+                val players = playerList.map {
+                    it.copy(isActive = packageName == it.packageName)
                 }
+                _uiState.update {
+                    it.copy(
+                        players = players,
+                        currTrack = info?.toTrackInfo(),
+                        isPlaying = info?.playState == PlayState.Playing,
+                        position = info?.position ?: 0L,
+                        duration = info?.duration ?: 0L,
+                        albumArt = info?.albumArt,
+                    )
+                }
+            }
         }
     }
 

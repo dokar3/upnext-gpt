@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences>
@@ -19,6 +20,7 @@ class Settings(private val dataStore: DataStore<Preferences>) {
     private val nextTrackIdKey = longPreferencesKey("next_track")
 
     val currentPlayerFlow: Flow<String?> = dataStore.data
+        .filter { it.contains(currentPlayerKey) }
         .map { it[currentPlayerKey] }
 
     suspend fun updateCurrentPlayer(value: String?) {
@@ -32,6 +34,7 @@ class Settings(private val dataStore: DataStore<Preferences>) {
     }
 
     val nextTrackIdFlow: Flow<Long?> = dataStore.data
+        .filter { it.contains(nextTrackIdKey) }
         .map { it[nextTrackIdKey] }
 
     suspend fun updateNextTrackId(value: Long?) {
