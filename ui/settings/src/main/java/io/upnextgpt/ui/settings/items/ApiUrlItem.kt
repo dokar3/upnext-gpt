@@ -27,12 +27,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 internal fun ApiBaseUrlItem(
     apiBaseUrl: String?,
     isTestingUrl: Boolean,
+    testResultMessage: String?,
     isUrlWorkingProperly: Boolean?,
     onTestClick: () -> Unit,
     onSubmit: (value: String) -> Unit,
@@ -59,6 +62,16 @@ internal fun ApiBaseUrlItem(
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        if (!testResultMessage.isNullOrEmpty()) {
+            Text(
+                text = testResultMessage,
+                modifier = Modifier.padding(horizontal = 8.dp),
+                maxLines = 5,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 14.sp,
+            )
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),

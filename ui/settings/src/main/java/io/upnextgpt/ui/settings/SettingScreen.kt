@@ -61,6 +61,7 @@ fun SettingsScreen(
                 ApiBaseUrlItem(
                     apiBaseUrl = uiState.apiBaseUrl,
                     isTestingUrl = uiState.isTestingApiBaseUrl,
+                    testResultMessage = uiState.testResultMessage,
                     isUrlWorkingProperly = uiState.isApiBaseUrlWorkingProperly,
                     onTestClick = viewModel::testApiBaseUrl,
                     onSubmit = viewModel::updateApiBaseUrl,

@@ -6,5 +6,6 @@ import androidx.compose.runtime.Immutable
 data class SettingsUiState(
     val apiBaseUrl: String? = null,
     val isTestingApiBaseUrl: Boolean = false,
+    val testResultMessage: String? = null,
     val isApiBaseUrlWorkingProperly: Boolean? = null,
 )

@@ -30,6 +30,7 @@ class SettingsViewModel(
             _uiState.update {
                 it.copy(
                     apiBaseUrl = baseUrl ?: Api.BASE_URL,
+                    testResultMessage = null,
                     isTestingApiBaseUrl = false,
                     isApiBaseUrlWorkingProperly = null,
                 )
@@ -44,20 +45,22 @@ class SettingsViewModel(
     fun testApiBaseUrl() = viewModelScope.launch(dispatcher) {
         _uiState.update {
             it.copy(
+                testResultMessage = null,
                 isTestingApiBaseUrl = true,
                 isApiBaseUrlWorkingProperly = null,
             )
         }
         val service = api.service<TrackService>()
-        val isWorkingProperly = try {
-            service.status().ok
+        val result = try {
+            service.status()
         } catch (e: Exception) {
-            false
+            null
         }
         _uiState.update {
             it.copy(
+                testResultMessage = result?.message,
                 isTestingApiBaseUrl = false,
-                isApiBaseUrlWorkingProperly = isWorkingProperly,
+                isApiBaseUrlWorkingProperly = result?.ok == true,
             )
         }
     }
