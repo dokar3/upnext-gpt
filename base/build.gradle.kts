@@ -44,6 +44,8 @@ dependencies {
     implementation(platform("dev.chrisbanes.compose:compose-bom:2023.04.00-beta02"))
 
     api(libs.koin)
+    api(libs.coil)
+    api(libs.diskLruCache)
 
     implementation(libs.compose.runtime)
     implementation(libs.core.ktx)

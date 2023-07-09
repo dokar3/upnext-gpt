@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.upnextgpt.base.AppLauncher
 import io.upnextgpt.base.SealedResult
+import io.upnextgpt.base.image.DiskImageStore
 import io.upnextgpt.base.util.remove
 import io.upnextgpt.data.fetcher.NextTrackFetcher
 import io.upnextgpt.data.model.Track
@@ -30,6 +31,7 @@ class HomeViewModel(
     private val appLauncher: AppLauncher,
     private val nextTrackFetcher: NextTrackFetcher,
     private val trackRepo: TrackRepository,
+    private val diskImageStore: DiskImageStore,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
     private var playerListenJob: Job? = null
@@ -98,6 +100,16 @@ class HomeViewModel(
                 addTrackToQueue(currTrack)
                 trackRepo.save(currTrack)
                 fetchNextTrack()
+                // Update local album art
+                val albumArt = uiState.value.albumArt
+                if (albumArt != null) {
+                    diskImageStore.save(
+                        bitmap = albumArt,
+                        key = currTrack.id.toString(),
+                    )
+                } else {
+                    diskImageStore.delete(currTrack.id.toString())
+                }
             }
     }
 
@@ -163,6 +175,7 @@ class HomeViewModel(
 
     fun removeTrackFromQueue(track: Track) = viewModelScope.launch(dispatcher) {
         trackRepo.delete(track.id)
+        diskImageStore.delete(track.id.toString())
         val list = playerQueue.value.toMutableList()
         val index = list.remove { it.id == track.id }
         if (index != null) {
@@ -196,8 +209,13 @@ class HomeViewModel(
         _uiState.update { it.copy(error = null) }
     }
 
-    fun clearQueue() = viewModelScope.launch(dispatcher) {
-        trackRepo.clearQueue(queueId = null)
+    fun clearQueue(queueId: String? = null) = viewModelScope.launch(
+        dispatcher
+    ) {
+        trackRepo.getQueueTracks(queueId).forEach {
+            diskImageStore.delete(it.id.toString())
+        }
+        trackRepo.clearQueue(queueId)
     }
 
     fun fetchNextTrack() {

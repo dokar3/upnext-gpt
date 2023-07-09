@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,16 +33,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.ImageLoader
+import coil.compose.AsyncImage
 import io.upnextgpt.base.ImmutableHolder
+import io.upnextgpt.base.image.DiskImageStore
 import io.upnextgpt.data.model.Track
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.shared.widget.ShimmerBorderSnackbar
 import io.upnextgpt.ui.shared.widget.TitleBar
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
+import org.koin.compose.koinInject
 import io.upnextgpt.ui.shared.R as SharedR
 
 @Composable
@@ -142,6 +148,7 @@ private fun TrackItem(
     onDelete: () -> Unit,
     isCurrent: Boolean,
     modifier: Modifier = Modifier,
+    icon: @Composable ((Track) -> Unit)? = { TrackCover(track = it) },
 ) {
     val deleteAction = SwipeAction(
         onSwipe = onDelete,
@@ -161,26 +168,51 @@ private fun TrackItem(
         swipeThreshold = 96.dp,
     ) {
         Box(modifier = Modifier.height(IntrinsicSize.Max)) {
-
-            Column(
+            Row(
                 modifier = modifier
                     .fillMaxWidth()
                     .clickable(onClick = onClick)
                     .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = item.title)
+                if (icon != null) {
+                    icon(item)
 
-                Text(text = item.artist, fontSize = 14.sp)
+                    Spacer(modifier = Modifier.width(16.dp))
+                }
+
+                Column {
+                    Text(text = item.title)
+
+                    Text(text = item.artist, fontSize = 14.sp)
+                }
             }
 
             if (isCurrent) {
                 Spacer(
                     modifier = Modifier
-                        .width(6.dp)
+                        .width(4.dp)
                         .fillMaxHeight()
                         .background(MaterialTheme.colorScheme.secondary)
                 )
             }
         }
     }
+}
+
+@Composable
+private fun TrackCover(
+    track: Track,
+    modifier: Modifier = Modifier,
+    imageLoader: ImageLoader = koinInject(),
+) {
+    AsyncImage(
+        model = DiskImageStore.url(track.id.toString()),
+        contentDescription = null,
+        modifier = modifier
+            .size(48.dp)
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surfaceVariant),
+        imageLoader = imageLoader,
+    )
 }

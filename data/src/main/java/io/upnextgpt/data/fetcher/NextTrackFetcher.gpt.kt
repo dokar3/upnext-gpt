@@ -1,6 +1,5 @@
 package io.upnextgpt.data.fetcher
 
-import io.upnextgpt.base.Logger
 import io.upnextgpt.base.SealedResult
 import io.upnextgpt.data.api.Api
 import io.upnextgpt.data.api.TrackService
@@ -13,9 +12,7 @@ class GptNextTrackFetcher(
     override suspend fun fetch(
         queue: List<Track>
     ): SealedResult<Track, Exception> {
-        Logger.d("Fetcher", "service: before")
         val service = api.service<TrackService>()
-        Logger.d("Fetcher", "service: $service")
         val res = try {
             val body = TrackService.NextTrackBody(queue = queue)
             service.nextTrack(body)

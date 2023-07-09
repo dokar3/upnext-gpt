@@ -4,9 +4,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import coil.ImageLoader
 import io.upnextgpt.Database
 import io.upnextgpt.base.AppLauncher
 import io.upnextgpt.base.ContextAppLauncher
+import io.upnextgpt.base.image.DiskImageStore
+import io.upnextgpt.base.image.newImageLoader
 import io.upnextgpt.data.api.Api
 import io.upnextgpt.data.api.ApiImpl
 import io.upnextgpt.data.dao.TrackDao
@@ -38,6 +41,13 @@ val appModule = module {
     }
     single<Database> { Database(driver = get()) }
     single { NotificationBasedPlayer(context = androidContext()) }
+    single { DiskImageStore(context = androidContext()) }
+    single<ImageLoader> {
+        newImageLoader(
+            context = androidContext(),
+            diskImageStore = get(),
+        )
+    }
 
     factory { TrackDao(database = get()) }
     factory { TrackRepository(trackDao = get()) }
@@ -49,6 +59,7 @@ val appModule = module {
             appLauncher = get(),
             nextTrackFetcher = get(),
             trackRepo = get(),
+            diskImageStore = get(),
         )
     }
 
