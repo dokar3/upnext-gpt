@@ -6,6 +6,7 @@ import io.upnextgpt.data.api.Api
 import io.upnextgpt.data.api.TrackService
 import io.upnextgpt.data.api.service
 import io.upnextgpt.data.settings.Settings
+import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
+    private val player: NotificationBasedPlayer,
     private val api: Api,
     private val settings: Settings,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
@@ -23,6 +25,7 @@ class SettingsViewModel(
 
     init {
         listenApiBaseUrlChanges()
+        updatePlayerConnectionStatus()
     }
 
     private fun listenApiBaseUrlChanges() = viewModelScope.launch(dispatcher) {
@@ -36,6 +39,16 @@ class SettingsViewModel(
                 )
             }
         }
+    }
+
+    fun updatePlayerConnectionStatus() = viewModelScope.launch(dispatcher) {
+        _uiState.update {
+            it.copy(isConnectedToPlayers  = player.isConnected())
+        }
+    }
+
+    fun connectToPlayers() {
+        player.connect()
     }
 
     fun updateApiBaseUrl(url: String?) = viewModelScope.launch(dispatcher) {

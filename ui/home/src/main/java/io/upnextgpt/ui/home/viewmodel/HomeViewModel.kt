@@ -135,7 +135,7 @@ class HomeViewModel(
         }
     }
 
-    fun connectToPlayer() = viewModelScope.launch(dispatcher) {
+    fun connectToPlayers() = viewModelScope.launch(dispatcher) {
         player.connect()
     }
 

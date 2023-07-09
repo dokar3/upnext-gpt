@@ -37,8 +37,8 @@ val appModule = module {
         )
     }
     single<Database> { Database(driver = get()) }
+    single { NotificationBasedPlayer(context = androidContext()) }
 
-    factory { NotificationBasedPlayer(context = androidContext()) }
     factory { TrackDao(database = get()) }
     factory { TrackRepository(trackDao = get()) }
 
@@ -54,6 +54,7 @@ val appModule = module {
 
     viewModel<SettingsViewModel> {
         SettingsViewModel(
+            player = get(),
             api = get(),
             settings = get(),
         )

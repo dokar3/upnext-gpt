@@ -27,8 +27,10 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,6 +56,8 @@ import io.upnextgpt.ui.home.viewmodel.HomeUiState
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.home.viewmodel.PlayerMeta
 import io.upnextgpt.ui.shared.compose.rememberLifecycleEvent
+import io.upnextgpt.ui.shared.dialog.ConnectToPlayersDialog
+import io.upnextgpt.ui.shared.theme.warn
 import io.upnextgpt.ui.shared.widget.ShimmerBorderSnackbar
 import io.upnextgpt.ui.shared.widget.SnackbarType
 import io.upnextgpt.ui.shared.widget.SpringDragBox
@@ -72,6 +76,14 @@ fun HomeScreen(
 
     val lifecycleEvent = rememberLifecycleEvent()
 
+    val isConnectedToPlayer = uiState.isConnectedToPlayers
+
+    var isShowConnectToPlayersDialog by remember(isConnectedToPlayer) {
+        mutableStateOf(
+            false
+        )
+    }
+
     LaunchedEffect(viewModel, lifecycleEvent) {
         if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
             viewModel.updatePlayerConnectionStatus()
@@ -80,12 +92,12 @@ fun HomeScreen(
 
     Column(modifier = modifier) {
         AnimatedVisibility(
-            visible = !uiState.isConnectedToPlayers,
+            visible = !isConnectedToPlayer,
             enter = expandVertically(),
             exit = shrinkVertically(),
         ) {
             PlayersNotConnectedBar(
-                onConnectClick = { viewModel.connectToPlayer() },
+                onConnectClick = { isShowConnectToPlayersDialog = true },
             )
         }
 
@@ -115,6 +127,13 @@ fun HomeScreen(
             onFetchNextTrackClick = viewModel::fetchNextTrack,
             onNavigate = onNavigate,
             modifier = Modifier.padding(horizontal = 32.dp),
+        )
+    }
+
+    if (isShowConnectToPlayersDialog) {
+        ConnectToPlayersDialog(
+            onDismissRequest = { isShowConnectToPlayersDialog = false },
+            onConnectClick = viewModel::connectToPlayers,
         )
     }
 }
@@ -288,7 +307,7 @@ private fun PlayersNotConnectedBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color(0xFFFF9800))
+            .background(MaterialTheme.colorScheme.warn)
             .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,

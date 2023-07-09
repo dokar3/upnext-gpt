@@ -61,7 +61,7 @@ internal fun AboutItem(
             .padding(8.dp)
             .fillMaxWidth(),
     ) {
-        Text("Open sourced, by dokar")
+        Text("Open-sourced, by dokar")
 
         Spacer(modifier = Modifier.height(8.dp))
 

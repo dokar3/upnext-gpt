@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class SettingsUiState(
+    val isConnectedToPlayers: Boolean = true,
     val apiBaseUrl: String? = null,
     val isTestingApiBaseUrl: Boolean = false,
     val testResultMessage: String? = null,
