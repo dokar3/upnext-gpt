@@ -6,7 +6,10 @@ import io.upnextgpt.data.model.Track
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface NextTrackService {
+interface TrackService {
+    @POST("/api/status")
+    suspend fun status(): ApiResponse<String>
+
     @POST("/api/next-track")
     suspend fun nextTrack(
         @Body body: NextTrackBody

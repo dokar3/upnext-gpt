@@ -7,53 +7,39 @@ import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import io.upnextgpt.Database
 import io.upnextgpt.base.AppLauncher
 import io.upnextgpt.base.ContextAppLauncher
-import io.upnextgpt.data.api.NextTrackService
+import io.upnextgpt.data.api.Api
+import io.upnextgpt.data.api.ApiImpl
 import io.upnextgpt.data.dao.TrackDao
 import io.upnextgpt.data.fetcher.GptNextTrackFetcher
 import io.upnextgpt.data.fetcher.NextTrackFetcher
 import io.upnextgpt.data.repository.TrackRepository
 import io.upnextgpt.data.settings.Settings
+import io.upnextgpt.data.settings.SettingsImpl
 import io.upnextgpt.data.settings.dataStore
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
+import io.upnextgpt.ui.settings.viewmodel.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
-
-private const val API_BASE_URL = "https://upnextgpt.vercel.app"
 
 val appModule = module {
     single<DataStore<Preferences>> { androidContext().dataStore }
     single<AppLauncher> { ContextAppLauncher(context = androidContext()) }
-    single<Settings> { Settings(get()) }
-
-    single<NextTrackService> {
-        Retrofit.Builder()
-            .baseUrl(API_BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create<NextTrackService>()
-    }
-
-    single<NextTrackFetcher> { GptNextTrackFetcher(nextTrackService = get()) }
-
+    single<Settings> { SettingsImpl(get()) }
+    single<Api> { ApiImpl(settings = get()) }
+    single<NextTrackFetcher> { GptNextTrackFetcher(api = get()) }
     single<SqlDriver> {
         AndroidSqliteDriver(
-            Database.Schema,
-            androidContext(),
-            "app.db"
+            schema = Database.Schema,
+            context = androidContext(),
+            name = "app.db",
         )
     }
-
     single<Database> { Database(driver = get()) }
 
     factory { NotificationBasedPlayer(context = androidContext()) }
-
     factory { TrackDao(database = get()) }
-
     factory { TrackRepository(trackDao = get()) }
 
     viewModel<HomeViewModel> {
@@ -63,6 +49,13 @@ val appModule = module {
             appLauncher = get(),
             nextTrackFetcher = get(),
             trackRepo = get(),
+        )
+    }
+
+    viewModel<SettingsViewModel> {
+        SettingsViewModel(
+            api = get(),
+            settings = get(),
         )
     }
 }

@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import io.upnextgpt.ui.home.HomeScreen
 import io.upnextgpt.ui.home.QueueScreen
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
+import io.upnextgpt.ui.settings.SettingsScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -75,6 +76,29 @@ fun AppNavGraph(
             ) {
                 QueueScreen(
                     viewModel = homeViewModel,
+                    onBack = { navController.popBackStack() },
+                )
+            }
+            composable(
+                route = "settings",
+                enterTransition = {
+                    scaleIn(
+                        initialScale = 1.2f,
+                        animationSpec = tween(durationMillis = 300),
+                    ) + fadeIn(
+                        animationSpec = tween(durationMillis = 300),
+                    )
+                },
+                exitTransition = {
+                    scaleOut(
+                        targetScale = 1.2f,
+                        animationSpec = tween(durationMillis = 225),
+                    ) + fadeOut(
+                        animationSpec = tween(durationMillis = 225),
+                    )
+                },
+            ) {
+                SettingsScreen(
                     onBack = { navController.popBackStack() },
                 )
             }

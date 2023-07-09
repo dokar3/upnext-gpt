@@ -38,6 +38,7 @@ import io.upnextgpt.base.ImmutableHolder
 import io.upnextgpt.data.model.Track
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.shared.widget.ShimmerBorderSnackbar
+import io.upnextgpt.ui.shared.widget.TitleBar
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 import io.upnextgpt.ui.shared.R as SharedR

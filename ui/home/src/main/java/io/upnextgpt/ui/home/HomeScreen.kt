@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -31,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -54,8 +57,10 @@ import io.upnextgpt.ui.shared.compose.rememberLifecycleEvent
 import io.upnextgpt.ui.shared.widget.ShimmerBorderSnackbar
 import io.upnextgpt.ui.shared.widget.SnackbarType
 import io.upnextgpt.ui.shared.widget.SpringDragBox
+import io.upnextgpt.ui.shared.widget.TitleBar
 import io.upnextgpt.ui.shared.widget.TypedSnackbarVisuals
 import kotlinx.coroutines.launch
+import io.upnextgpt.ui.shared.R as SharedR
 
 @Composable
 fun HomeScreen(
@@ -86,7 +91,17 @@ fun HomeScreen(
 
         TitleBar(
             title = stringResource(R.string.app_name),
-            modifier = Modifier.padding(horizontal = 32.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
+            endButton = {
+                IconButton(onClick = { onNavigate("settings") }) {
+                    Icon(
+                        painter = painterResource(
+                            SharedR.drawable.outline_settings
+                        ),
+                        contentDescription = "Settings",
+                    )
+                }
+            },
         )
 
         Player(

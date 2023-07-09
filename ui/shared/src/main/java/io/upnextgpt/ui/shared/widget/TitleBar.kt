@@ -1,4 +1,4 @@
-package io.upnextgpt.ui.home
+package io.upnextgpt.ui.shared.widget
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,11 +22,12 @@ import io.upnextgpt.ui.shared.Jost
 import io.upnextgpt.ui.shared.R as SharedR
 
 @Composable
-internal fun TitleBar(
+fun TitleBar(
     title: String,
     modifier: Modifier = Modifier,
     showBack: Boolean = false,
     onBack: (() -> Unit)? = null,
+    endButton: @Composable (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -58,6 +59,10 @@ internal fun TitleBar(
             fontSize = 20.sp,
         )
 
-        Box(modifier = Modifier.width(56.dp))
+        Box(modifier = Modifier.width(56.dp)) {
+            if (endButton != null) {
+                endButton()
+            }
+        }
     }
 }
