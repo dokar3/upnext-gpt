@@ -40,10 +40,10 @@ fun SettingsScreen(
 
     val itemModifier = Modifier
         .clip(MaterialTheme.shapes.medium)
-        .background(MaterialTheme.colorScheme.surfaceVariant)
+        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
         .border(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.24f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
             shape = MaterialTheme.shapes.medium,
         )
         .padding(8.dp)
