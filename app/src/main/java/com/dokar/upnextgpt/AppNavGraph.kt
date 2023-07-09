@@ -40,7 +40,12 @@ fun AppNavGraph(
                     )
                 },
                 popEnterTransition = {
-                    scaleIn(initialScale = 0.8f) + fadeIn()
+                    scaleIn(
+                        initialScale = 0.8f,
+                        animationSpec = tween(durationMillis = 300),
+                    ) + fadeIn(
+                        animationSpec = tween(durationMillis = 300),
+                    )
                 },
             ) {
                 HomeScreen(
