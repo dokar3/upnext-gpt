@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
@@ -97,6 +98,7 @@ fun QueueScreen(
             Divider()
 
             QueueList(
+                nextTrack = uiState.nextTrack,
                 items = ImmutableHolder(queue),
                 onItemClick = viewModel::playTrack,
                 onDelete = viewModel::removeTrackFromQueue,
@@ -119,6 +121,7 @@ fun QueueScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun QueueList(
+    nextTrack: Track?,
     items: ImmutableHolder<List<Track>>,
     onItemClick: (track: Track) -> Unit,
     onDelete: (track: Track) -> Unit,
@@ -126,6 +129,35 @@ private fun QueueList(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier) {
+        if (nextTrack != null) {
+            item {
+                SectionHeader(title = "Up Next")
+
+                TrackItem(
+                    item = nextTrack,
+                    onClick = { onItemClick(nextTrack) },
+                    onDelete = {},
+                    isCurrent = false,
+                    swipeable = false,
+                    icon = {
+                        Icon(
+                            painter = painterResource(
+                                SharedR.drawable.fill_sparkles
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(4.dp),
+                        )
+                    },
+                )
+            }
+        }
+
+        item {
+            SectionHeader(title = "History")
+        }
+
         items(
             items = items.value,
             key = { it.id },
@@ -142,12 +174,29 @@ private fun QueueList(
 }
 
 @Composable
+private fun SectionHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = title,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier.padding(
+            horizontal = 16.dp,
+            vertical = 8.dp,
+        ),
+    )
+}
+
+@Composable
 private fun TrackItem(
     item: Track,
     onClick: () -> Unit,
     onDelete: () -> Unit,
     isCurrent: Boolean,
     modifier: Modifier = Modifier,
+    swipeable: Boolean = !isCurrent,
     icon: @Composable ((Track) -> Unit)? = { TrackCover(track = it) },
 ) {
     val deleteAction = SwipeAction(
@@ -164,7 +213,7 @@ private fun TrackItem(
     )
 
     SwipeableActionsBox(
-        endActions = if (isCurrent) emptyList() else listOf(deleteAction),
+        endActions = if (swipeable) listOf(deleteAction) else emptyList(),
         swipeThreshold = 96.dp,
     ) {
         Box(modifier = Modifier.height(IntrinsicSize.Max)) {
