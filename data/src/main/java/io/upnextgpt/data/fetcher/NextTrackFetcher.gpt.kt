@@ -14,7 +14,12 @@ class GptNextTrackFetcher(
     ): SealedResult<Track, Exception> {
         val service = api.service<TrackService>()
         val res = try {
-            val body = TrackService.NextTrackBody(queue = queue)
+            val body = TrackService.NextTrackBody(
+                queue = queue.subList(
+                    fromIndex = 0,
+                    toIndex = minOf(queue.size, MAX_HISTORY_TRACKS)
+                ),
+            )
             service.nextTrack(body)
         } catch (e: Exception) {
             return SealedResult.Err(e)
@@ -24,5 +29,9 @@ class GptNextTrackFetcher(
         } else {
             SealedResult.Err(Exception(res.message))
         }
+    }
+
+    companion object {
+        private const val MAX_HISTORY_TRACKS = 20
     }
 }
