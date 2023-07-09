@@ -4,6 +4,7 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager.NameNotFoundException
+import android.net.Uri
 import android.provider.MediaStore
 import io.upnextgpt.base.Logger
 import io.upnextgpt.base.SealedResult
@@ -56,6 +57,15 @@ object IntentUtil {
             }
         if (intent.resolveActivity(context.packageManager) != null) {
             context.startActivity(intent)
+        }
+    }
+
+    fun openUrl(context: Context, url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            context.startActivity(intent)
+        } catch (_: Exception) {
         }
     }
 }

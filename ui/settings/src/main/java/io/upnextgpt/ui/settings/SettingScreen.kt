@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.upnextgpt.ui.settings.items.AboutItem
 import io.upnextgpt.ui.settings.items.ApiBaseUrlItem
 import io.upnextgpt.ui.settings.viewmodel.SettingsViewModel
 import io.upnextgpt.ui.shared.widget.TitleBar
@@ -67,6 +68,12 @@ fun SettingsScreen(
                     onSubmit = viewModel::updateApiBaseUrl,
                     modifier = itemModifier,
                 )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            itemWithTitle("About") {
+                AboutItem(modifier = itemModifier)
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
