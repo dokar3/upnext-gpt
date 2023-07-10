@@ -101,7 +101,10 @@ fun QueueScreen(
                 showBack = true,
                 onBack = onBack,
                 endButton = {
-                    IconButton(onClick = { isShowClearQueueDialog = true }) {
+                    IconButton(
+                        onClick = { isShowClearQueueDialog = true },
+                        enabled = queue.isNotEmpty(),
+                    ) {
                         Icon(
                             painter = painterResource(
                                 SharedR.drawable.baseline_clear_all_24
@@ -189,7 +192,11 @@ private fun QueueList(
         }
 
         item {
-            SectionHeader(title = "History")
+            if (items.value.isNotEmpty()) {
+                SectionHeader(title = "History")
+            } else {
+                EmptyHistory()
+            }
         }
 
         items(
@@ -298,4 +305,29 @@ private fun TrackCover(
             .background(MaterialTheme.colorScheme.surfaceVariant),
         imageLoader = imageLoader,
     )
+}
+
+@Composable
+private fun EmptyHistory(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            painter = painterResource(
+                SharedR.drawable.baseline_queue_music_24
+            ),
+            contentDescription = null,
+            modifier = Modifier.size(96.dp),
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "No history.",
+            fontSize = 18.sp,
+        )
+    }
 }
