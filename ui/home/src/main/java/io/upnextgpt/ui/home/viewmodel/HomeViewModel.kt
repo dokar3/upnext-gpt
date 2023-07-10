@@ -81,7 +81,16 @@ class HomeViewModel(
             val players = playerList.map {
                 it.copy(isActive = packageName == it.packageName)
             }
-            val currTrack = info?.toTrack()
+            val currTrack = info?.toTrack()?.let {
+                val saved = trackRepo.get(id = it.id)
+                it.copy(
+                    liked = saved?.liked,
+                    disliked = saved?.disliked,
+                    queueId = saved?.queueId,
+                    addedAt = saved?.addedAt ?: -1,
+                    updatedAt = saved?.updatedAt ?: -1,
+                )
+            }
             _uiState.update {
                 it.copy(
                     players = players,
@@ -244,6 +253,45 @@ class HomeViewModel(
             artist = track.artist,
             album = track.album,
         )
+    }
+
+    fun likeTrack(track: Track) = viewModelScope.launch(dispatcher) {
+        val updated = track.copy(liked = true, disliked = null)
+        updateTrack(updated)
+    }
+
+    fun cancelLikeTrack(track: Track) = viewModelScope.launch(dispatcher) {
+        val updated = track.copy(liked = null, disliked = null)
+        updateTrack(updated)
+    }
+
+    fun dislikeTrack(track: Track) = viewModelScope.launch(dispatcher) {
+        val updated = track.copy(liked = null, disliked = true)
+        updateTrack(updated)
+    }
+
+    fun cancelDislikeTrack(track: Track) = viewModelScope.launch(dispatcher) {
+        val updated = track.copy(liked = null, disliked = null)
+        updateTrack(updated)
+    }
+
+    private suspend fun updateTrack(track: Track) {
+        // Current track
+        val currTrack = uiState.value.currTrack
+        if (currTrack?.id == track.id) {
+            _uiState.update { it.copy(currTrack = track) }
+        }
+        // Queue track
+        val queueIndex = playerQueue.value.indexOfFirst { it.id == track.id }
+        if (queueIndex != -1) {
+            val list = playerQueue.value.toMutableList()
+            list[queueIndex] = track
+            _playerQueue.update { list }
+        }
+        // Database
+        if (trackRepo.exists(track.id)) {
+            trackRepo.save(track)
+        }
     }
 
     fun removeTrackFromQueue(track: Track) = viewModelScope.launch(dispatcher) {

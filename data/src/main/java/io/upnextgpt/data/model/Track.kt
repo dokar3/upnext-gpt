@@ -42,7 +42,7 @@ fun DbTrack.toApiTrack(): Track = Track(
     albumArtist = albumArtist,
     duration = duration,
     liked = liked == 1L,
-    disliked = liked == 1L,
+    disliked = disliked == 1L,
     queueId = queueId,
     addedAt = addedAt,
     updatedAt = updatedAt,

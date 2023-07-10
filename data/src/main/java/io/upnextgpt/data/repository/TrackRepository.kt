@@ -8,8 +8,16 @@ import io.upnextgpt.data.model.toDbTrack
 class TrackRepository(
     private val trackDao: TrackDao,
 ) {
+    suspend fun get(id: Long): Track? {
+        return trackDao.get(id)?.toApiTrack()
+    }
+
     suspend fun getQueueTracks(queueId: String?): List<Track> {
         return trackDao.getQueue(queueId).map { it.toApiTrack() }
+    }
+
+    suspend fun exists(id: Long): Boolean {
+        return trackDao.exists(id)
     }
 
     suspend fun save(track: Track) {

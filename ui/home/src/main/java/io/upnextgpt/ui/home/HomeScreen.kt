@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -125,6 +128,10 @@ fun HomeScreen(
             onPlayTrack = viewModel::playTrack,
             onClearError = viewModel::clearError,
             onFetchNextTrackClick = viewModel::fetchNextTrack,
+            onLikeTrack = viewModel::likeTrack,
+            onCancelLikeTrack = viewModel::cancelLikeTrack,
+            onDislikeTrack = viewModel::dislikeTrack,
+            onCancelDislikeTrack = viewModel::cancelDislikeTrack,
             onNavigate = onNavigate,
             modifier = Modifier.padding(horizontal = 32.dp),
         )
@@ -148,6 +155,10 @@ private fun Player(
     onPlayTrack: (track: Track) -> Unit,
     onFetchNextTrackClick: () -> Unit,
     onClearError: () -> Unit,
+    onLikeTrack: (track: Track) -> Unit,
+    onCancelLikeTrack: (track: Track) -> Unit,
+    onDislikeTrack: (track: Track) -> Unit,
+    onCancelDislikeTrack: (track: Track) -> Unit,
     onNavigate: (route: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -157,6 +168,8 @@ private fun Player(
 
     val track = uiState.currTrack
 
+    val albumArt = ImmutableHolder(uiState.albumArt)
+
     val scope = rememberCoroutineScope()
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -164,6 +177,8 @@ private fun Player(
     val scrollState = rememberScrollState()
 
     val playerSelectorSheetState = rememberBottomSheetState()
+
+    val trackMenuSheetState = rememberBottomSheetState()
 
     LaunchedEffect(uiState.error) {
         if (uiState.error != null) {
@@ -190,7 +205,7 @@ private fun Player(
         ) {
             CoverView(
                 key = track?.title + track?.artist,
-                bitmap = ImmutableHolder(uiState.albumArt)
+                bitmap = albumArt,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -204,13 +219,30 @@ private fun Player(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = track?.title ?: "Not Playing",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = track?.title ?: "Not Playing",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
 
-            Text(text = track?.artist ?: "-")
+                    Text(text = track?.artist ?: "-")
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                IconButton(
+                    onClick = {
+                        scope.launch { trackMenuSheetState.expand() }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.MoreVert,
+                        contentDescription = "Track menu",
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -297,6 +329,18 @@ private fun Player(
             onSelectPlayer(it)
         },
     )
+
+    if (track != null) {
+        TrackMenuSheet(
+            track = track,
+            albumArt = albumArt,
+            state = trackMenuSheetState,
+            onLike = { onLikeTrack(track) },
+            onCancelLike = { onCancelLikeTrack(track) },
+            onDislike = { onDislikeTrack(track) },
+            onCancelDislike = { onCancelDislikeTrack(track) },
+        )
+    }
 }
 
 @Composable
