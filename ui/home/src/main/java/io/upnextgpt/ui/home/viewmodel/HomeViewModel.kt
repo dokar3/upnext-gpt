@@ -13,6 +13,7 @@ import io.upnextgpt.data.repository.TrackRepository
 import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.remote.palyer.PlayState
+import io.upnextgpt.remote.palyer.RemotePlayer
 import io.upnextgpt.remote.palyer.toTrack
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +21,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -54,6 +57,7 @@ class HomeViewModel(
         updatePlayerConnectionStatus()
         listenCurrPlayer()
         listenPlaybackStates()
+        listenPlaybackEvents()
         listenCurrTrack()
         listenNextTrack()
     }
@@ -96,6 +100,26 @@ class HomeViewModel(
                 )
             }
         }
+    }
+
+    private fun listenPlaybackEvents() = viewModelScope.launch(dispatcher) {
+        player.playbackEventFlow().collect {
+            if (it == RemotePlayer.PlaybackEvent.TrackFinished) {
+                val nextTrack = awaitNextTrackOrNull() ?: return@collect
+                // Play next track on finish
+                player.pause()
+                playTrack(nextTrack)
+            }
+        }
+    }
+
+    private suspend fun awaitNextTrackOrNull(): Track? {
+        val state = uiState.value
+        if (state.nextTrack != null) return state.nextTrack
+        if (!state.isLoadingNextTrack) return null
+        return uiState.filter { !it.isLoadingNextTrack }
+            .first()
+            .nextTrack
     }
 
     private fun listenCurrTrack() = viewModelScope.launch(dispatcher) {

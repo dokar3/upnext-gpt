@@ -17,5 +17,12 @@ interface RemotePlayer : PlayerActions {
 
     fun playbackInfoFlow(): Flow<PlaybackInfo?>
 
+    fun playbackEventFlow(): Flow<PlaybackEvent>
+
     fun destroy()
+
+    enum class PlaybackEvent {
+        TrackStarted,
+        TrackFinished,
+    }
 }

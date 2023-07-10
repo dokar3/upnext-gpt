@@ -5,11 +5,15 @@ import android.service.notification.StatusBarNotification
 import io.upnextgpt.base.Logger
 import io.upnextgpt.remote.NotificationCallback
 import io.upnextgpt.remote.Notifications
+import io.upnextgpt.remote.palyer.RemotePlayer.PlaybackEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -27,6 +31,9 @@ class NotificationBasedPlayer(
 
     private var currPlaybackInfo: PlaybackInfo? = null
     private val playbackInfoFlow = MutableSharedFlow<PlaybackInfo?>()
+    private val playbackEventFlow = MutableSharedFlow<PlaybackEvent>()
+
+    private var listenToFinishJob: Job? = null
 
     override fun onListenerServiceConnected() {
         Notifications.queryActiveNotifications(context)
@@ -96,11 +103,32 @@ class NotificationBasedPlayer(
         updatePlaybackInfo(activePlaybackInfo)
     }
 
-    private fun updatePlaybackInfo(info: PlaybackInfo?) =
+    private fun updatePlaybackInfo(
+        info: PlaybackInfo?
+    ) = coroutineScope.launch {
+        currPlaybackInfo = info
+        playbackInfoFlow.emit(info)
+        triggerPlaybackEventsIfNeeded(info)
+    }
+
+    private fun triggerPlaybackEventsIfNeeded(info: PlaybackInfo?) {
+        info ?: return
+        listenToFinishJob?.cancel()
+        if (info.playState != PlayState.Playing) return
         coroutineScope.launch {
-            currPlaybackInfo = info
-            playbackInfoFlow.emit(info)
+            if (info.position < 50) {
+                playbackEventFlow.emit(PlaybackEvent.TrackStarted)
+            }
+            if (info.duration > 0) {
+                listenToFinishJob = launch {
+                    val actualDelay = (info.duration - info.position) /
+                            info.speed - 50
+                    delay(actualDelay.toLong())
+                    playbackEventFlow.emit(PlaybackEvent.TrackFinished)
+                }
+            }
         }
+    }
 
     private fun currentNotification(): StatusBarNotification? {
         val currInfo = currPlaybackInfo ?: return null
@@ -184,6 +212,10 @@ class NotificationBasedPlayer(
     override fun playbackInfoFlow(): Flow<PlaybackInfo?> {
         return playbackInfoFlow
             .onStart { emit(currPlaybackInfo) }
+    }
+
+    override fun playbackEventFlow(): Flow<PlaybackEvent> {
+        return playbackEventFlow.distinctUntilChanged()
     }
 
     override fun destroy() {

@@ -77,8 +77,10 @@ fun UpNextCard(
             ) {
                 Text("Up Next")
 
+                val title = nextTrack?.title ?: ""
+                val artist = nextTrack?.artist ?: ""
                 Text(
-                    text = "${nextTrack?.title ?: ""} - ${nextTrack?.artist ?: ""}",
+                    text = "$artist - $title",
                     fontSize = 18.sp,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
