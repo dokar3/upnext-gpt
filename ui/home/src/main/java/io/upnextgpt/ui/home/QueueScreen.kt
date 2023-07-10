@@ -19,18 +19,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +48,7 @@ import io.upnextgpt.base.ImmutableHolder
 import io.upnextgpt.base.image.DiskImageStore
 import io.upnextgpt.data.model.Track
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
+import io.upnextgpt.ui.shared.dialog.BasicDialog
 import io.upnextgpt.ui.shared.widget.ShimmerBorderSnackbar
 import io.upnextgpt.ui.shared.widget.TitleBar
 import me.saket.swipe.SwipeAction
@@ -64,6 +69,8 @@ fun QueueScreen(
     val removedTrack by viewModel.removedTrack.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
+
+    var isShowClearQueueDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(viewModel, removedTrack) {
         val removed = removedTrack
@@ -93,6 +100,16 @@ fun QueueScreen(
                 title = "Queue",
                 showBack = true,
                 onBack = onBack,
+                endButton = {
+                    IconButton(onClick = { isShowClearQueueDialog = true }) {
+                        Icon(
+                            painter = painterResource(
+                                SharedR.drawable.baseline_clear_all_24
+                            ),
+                            contentDescription = "Clear all",
+                        )
+                    }
+                }
             )
 
             Divider()
@@ -114,6 +131,23 @@ fun QueueScreen(
                 snackbarData = it,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
+        }
+    }
+
+    if (isShowClearQueueDialog) {
+        BasicDialog(
+            onDismissRequest = { isShowClearQueueDialog = false },
+            title = { Text("Clear queue") },
+            actions = {
+                TextButton(onClick = {
+                    viewModel.clearQueue()
+                    isShowClearQueueDialog = false
+                }) {
+                    Text("Clear")
+                }
+            },
+        ) {
+            Text("Are you sure to clear the queue?")
         }
     }
 }

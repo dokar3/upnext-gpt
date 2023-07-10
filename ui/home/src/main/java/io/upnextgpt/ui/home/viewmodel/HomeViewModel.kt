@@ -223,10 +223,25 @@ class HomeViewModel(
     fun clearQueue(queueId: String? = null) = viewModelScope.launch(
         dispatcher
     ) {
+        val currTrack = uiState.value.currTrack
+        // Clear album arts
         trackRepo.getQueueTracks(queueId).forEach {
-            diskImageStore.delete(it.id.toString())
+            if (currTrack == null || it.id == currTrack.id) {
+                diskImageStore.delete(it.id.toString())
+            }
         }
+        // Clear db queue tracks
         trackRepo.clearQueue(queueId)
+        if (currTrack != null) {
+            trackRepo.save(currTrack)
+        }
+        // Update ui state
+        val newQueue = if (currTrack != null) {
+            listOf(currTrack)
+        } else {
+            emptyList()
+        }
+        _playerQueue.update { newQueue }
     }
 
     fun fetchNextTrack() {
