@@ -153,8 +153,24 @@ class HomeViewModel(
     }
 
     fun updatePlayerConnectionStatus() = viewModelScope.launch(dispatcher) {
-        _uiState.update {
-            it.copy(isConnectedToPlayers = player.isConnected())
+        val isConnected = player.isConnected()
+        _uiState.update { it.copy(isConnectedToPlayers = isConnected) }
+        if (isConnected) {
+            if (!player.isPrepared()) {
+                player.prepare()
+            }
+        } else {
+            player.sync()
+            _uiState.update {
+                it.copy(
+                    currTrack = null,
+                    albumArt = null,
+                    isPlaying = false,
+                    position = -1,
+                    duration = -1,
+                    nextTrack = null,
+                )
+            }
         }
     }
 

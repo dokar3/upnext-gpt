@@ -177,6 +177,7 @@ class NotificationBasedPlayer(
     }
 
     override fun sync() {
+        Notifications.queryActiveNotifications(context)
         playbackInfoFlow.tryEmit(currPlaybackInfo)
     }
 
