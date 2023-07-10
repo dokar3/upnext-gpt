@@ -188,6 +188,7 @@ private fun QueueList(
                             modifier = Modifier
                                 .size(48.dp)
                                 .padding(4.dp),
+                            tint = MaterialTheme.colorScheme.secondary,
                         )
                     },
                 )
