@@ -245,7 +245,9 @@ private fun TrackItem(
     swipeable: Boolean = !isCurrent,
     icon: @Composable ((Track) -> Unit)? = { TrackCover(track = it) },
 ) {
-    val swipeToDismissState = rememberDismissState()
+    val swipeToDismissState = rememberDismissState(
+        positionalThreshold = { 96.dp.toPx() },
+    )
 
     val currValue = swipeToDismissState.currentValue
 
@@ -257,7 +259,7 @@ private fun TrackItem(
     }
 
     LaunchedEffect(currValue, onDelete, shouldListenSwipeValue) {
-        if(!shouldListenSwipeValue) {
+        if (!shouldListenSwipeValue) {
             return@LaunchedEffect
         }
         if (currValue == DismissValue.DismissedToStart) {
