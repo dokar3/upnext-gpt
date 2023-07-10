@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,8 +28,10 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -51,8 +56,6 @@ import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.shared.dialog.BasicDialog
 import io.upnextgpt.ui.shared.widget.ShimmerBorderSnackbar
 import io.upnextgpt.ui.shared.widget.TitleBar
-import me.saket.swipe.SwipeAction
-import me.saket.swipe.SwipeableActionsBox
 import org.koin.compose.koinInject
 import io.upnextgpt.ui.shared.R as SharedR
 
@@ -230,6 +233,7 @@ private fun SectionHeader(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TrackItem(
     item: Track,
@@ -240,54 +244,86 @@ private fun TrackItem(
     swipeable: Boolean = !isCurrent,
     icon: @Composable ((Track) -> Unit)? = { TrackCover(track = it) },
 ) {
-    val deleteAction = SwipeAction(
-        onSwipe = onDelete,
-        icon = {
-            Row(modifier = Modifier.padding(horizontal = 32.dp)) {
+    val swipeToDismissState = rememberDismissState()
+
+    val currValue = swipeToDismissState.currentValue
+
+    var shouldListenSwipeValue by remember { mutableStateOf(false) }
+
+    LaunchedEffect(swipeToDismissState) {
+        swipeToDismissState.reset()
+        shouldListenSwipeValue = true
+    }
+
+    LaunchedEffect(currValue, onDelete, shouldListenSwipeValue) {
+        if(!shouldListenSwipeValue) {
+            return@LaunchedEffect
+        }
+        if (currValue == DismissValue.DismissedToStart) {
+            onDelete()
+        }
+    }
+
+    SwipeToDismiss(
+        state = swipeToDismissState,
+        directions = if (swipeable) {
+            setOf(DismissDirection.EndToStart)
+        } else {
+            emptySet()
+        },
+        background = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .padding(horizontal = 32.dp),
+            ) {
                 Icon(
                     painter = painterResource(SharedR.drawable.outline_delete),
                     contentDescription = "Delete",
+                    modifier = Modifier.align(Alignment.CenterEnd)
                 )
             }
         },
-        background = MaterialTheme.colorScheme.errorContainer,
-    )
-
-    SwipeableActionsBox(
-        endActions = if (swipeable) listOf(deleteAction) else emptyList(),
-        swipeThreshold = 96.dp,
-    ) {
-        Box(modifier = Modifier.height(IntrinsicSize.Max)) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onClick)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+        dismissContent = {
+            Box(
+                modifier = Modifier
+                    .height(IntrinsicSize.Max)
+                    .background(MaterialTheme.colorScheme.background),
             ) {
-                if (icon != null) {
-                    icon(item)
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onClick)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (icon != null) {
+                        icon(item)
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
+
+                    Column {
+                        Text(text = item.title)
+
+                        Text(text = item.artist, fontSize = 14.sp)
+                    }
                 }
 
-                Column {
-                    Text(text = item.title)
-
-                    Text(text = item.artist, fontSize = 14.sp)
+                if (isCurrent) {
+                    Spacer(
+                        modifier = Modifier
+                            .width(4.dp)
+                            .fillMaxHeight()
+                            .background(MaterialTheme.colorScheme.secondary)
+                    )
                 }
             }
 
-            if (isCurrent) {
-                Spacer(
-                    modifier = Modifier
-                        .width(4.dp)
-                        .fillMaxHeight()
-                        .background(MaterialTheme.colorScheme.secondary)
-                )
-            }
-        }
-    }
+        },
+    )
 }
 
 @Composable

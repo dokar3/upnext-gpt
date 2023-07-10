@@ -22,7 +22,6 @@ ksp = "1.8.22-1.0.11"
 moshi = "1.15.0"
 retrofit = "2.9.0"
 sqldelight = "2.0.0-rc02"
-swipe = "1.2.0"
 coil = "2.4.0"
 diskLruCache = "2.0.2"
 
@@ -65,8 +64,6 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 retrofit-converter-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "retrofit" }
 
 sqldelight-driver = { group = "app.cash.sqldelight", name = "android-driver", version.ref = "sqldelight" }
-
-swipe = { group = "me.saket.swipe", name = "swipe", version.ref = "swipe" }
 
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 diskLruCache = { group = "com.jakewharton", name = "disklrucache", version.ref = "diskLruCache" }
