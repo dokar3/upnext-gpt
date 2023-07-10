@@ -124,8 +124,8 @@ fun ConnectToPlayersDialog(
 
                 Text(
                     text = """    
-                            This is how this APP works, we only read necessary data from your media notifications.
-                            And the APP is open-sourced, both Android code and server code, we only use your playback history to recommend the next track.
+                            This is how this App works, we only read necessary data from your media notifications.
+                            And the App is open-sourced, both Android code and server code, we only use your playback history to recommend the next track.
                         """.trimIndent(),
                 )
 

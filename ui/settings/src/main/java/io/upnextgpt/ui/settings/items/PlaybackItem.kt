@@ -33,7 +33,7 @@ private fun trackFinishedActionDescription(
     return when (action) {
         TrackFinishedAction.None -> "None"
         TrackFinishedAction.Pause -> "Pause"
-        TrackFinishedAction.PauseAndOpenApp -> "Pause and open APP"
+        TrackFinishedAction.PauseAndOpenApp -> "Pause and open App"
         TrackFinishedAction.OpenPlayerToPlayNext -> "Open player to play next"
     }
 }
