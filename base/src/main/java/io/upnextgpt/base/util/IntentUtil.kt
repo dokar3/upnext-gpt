@@ -20,12 +20,13 @@ object IntentUtil {
 
     fun launchApp(
         context: Context,
-        packageName: String
+        packageName: String,
+        flags: Int = Intent.FLAG_ACTIVITY_NEW_TASK,
     ): SealedResult<Unit, String> {
         return try {
             val intent = context.packageManager
                 .getLaunchIntentForPackage(packageName)
-                ?.apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
+                ?.apply { this.flags = flags }
             require(intent != null) {
                 "Launch intent not found for package '$packageName'"
             }

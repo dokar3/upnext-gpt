@@ -12,6 +12,11 @@ class ContextAppLauncher(
         return IntentUtil.isPackageInstalled(context, packageName)
     }
 
+    override fun launchSelf() {
+        val packageName = context.packageName
+        IntentUtil.launchApp(context, packageName, flags = 0)
+    }
+
     override fun launchPackage(packageName: String) {
         IntentUtil.launchApp(context, packageName)
     }

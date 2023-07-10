@@ -1,4 +1,4 @@
-package io.upnextgpt.ui.shared.compose
+package io.upnextgpt.ui.shared.remember
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

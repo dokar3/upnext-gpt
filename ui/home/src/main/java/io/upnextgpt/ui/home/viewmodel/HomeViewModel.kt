@@ -11,6 +11,7 @@ import io.upnextgpt.data.fetcher.NextTrackFetcher
 import io.upnextgpt.data.model.Track
 import io.upnextgpt.data.repository.TrackRepository
 import io.upnextgpt.data.settings.Settings
+import io.upnextgpt.data.settings.TrackFinishedAction
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import io.upnextgpt.remote.palyer.PlayState
 import io.upnextgpt.remote.palyer.RemotePlayer
@@ -105,9 +106,30 @@ class HomeViewModel(
     private fun listenPlaybackEvents() = viewModelScope.launch(dispatcher) {
         player.playbackEventFlow().collect {
             if (it == RemotePlayer.PlaybackEvent.TrackFinished) {
-                val nextTrack = awaitNextTrackOrNull() ?: return@collect
-                // Play next track on finish
+                handleTrackFinished()
+            }
+        }
+    }
+
+    private suspend fun handleTrackFinished() {
+        when (settings.trackFinishedActionFlow.firstOrNull()) {
+            null,
+            TrackFinishedAction.None -> {
+            }
+
+            TrackFinishedAction.Pause -> {
                 player.pause()
+            }
+
+            TrackFinishedAction.PauseAndOpenApp -> {
+                player.pause()
+                appLauncher.launchSelf()
+            }
+
+            TrackFinishedAction.OpenPlayerToPlayNext -> {
+                player.pause()
+                val nextTrack = awaitNextTrackOrNull() ?: return
+                // Play next track on finish
                 playTrack(nextTrack)
             }
         }

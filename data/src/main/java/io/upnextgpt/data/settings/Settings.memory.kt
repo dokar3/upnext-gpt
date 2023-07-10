@@ -15,6 +15,11 @@ class MemorySettings : Settings {
     private val _apiBaseUrlFlow = MutableStateFlow<String?>(null)
     override val apiBaseUrlFlow: Flow<String?> = _apiBaseUrlFlow
 
+    private val _trackFinishedActionFlow =
+        MutableStateFlow<TrackFinishedAction?>(null)
+    override val trackFinishedActionFlow: Flow<TrackFinishedAction?> =
+        _trackFinishedActionFlow
+
     override suspend fun updateCurrentPlayer(value: String?) {
         _currentPlayerFlow.value = value
     }
@@ -25,5 +30,11 @@ class MemorySettings : Settings {
 
     override suspend fun updateApiBaseUrl(value: String?) {
         _apiBaseUrlFlow.value = value
+    }
+
+    override suspend fun updateTrackFinishedAction(
+        value: TrackFinishedAction?
+    ) {
+        _trackFinishedActionFlow.value = value
     }
 }

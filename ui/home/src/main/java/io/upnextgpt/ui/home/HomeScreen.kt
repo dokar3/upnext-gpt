@@ -55,8 +55,8 @@ import io.upnextgpt.ui.home.control.UpNextCard
 import io.upnextgpt.ui.home.viewmodel.HomeUiState
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.home.viewmodel.PlayerMeta
-import io.upnextgpt.ui.shared.compose.rememberLifecycleEvent
 import io.upnextgpt.ui.shared.dialog.ConnectToPlayersDialog
+import io.upnextgpt.ui.shared.remember.rememberLifecycleEvent
 import io.upnextgpt.ui.shared.theme.warn
 import io.upnextgpt.ui.shared.widget.ShimmerBorderSnackbar
 import io.upnextgpt.ui.shared.widget.SnackbarType

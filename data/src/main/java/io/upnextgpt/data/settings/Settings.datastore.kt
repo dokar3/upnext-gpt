@@ -21,6 +21,9 @@ class SettingsImpl(private val dataStore: DataStore<Preferences>) : Settings {
 
     private val apiBaseUrlKey = stringPreferencesKey("api_base_url")
 
+    private val trackFinishedActionKey =
+        stringPreferencesKey("track_finished_action")
+
     override val currentPlayerFlow: Flow<String?> = dataStore.data
         .map { it[currentPlayerKey] }
         .distinctUntilChanged()
@@ -59,6 +62,26 @@ class SettingsImpl(private val dataStore: DataStore<Preferences>) : Settings {
                 it.remove(apiBaseUrlKey)
             } else {
                 it[apiBaseUrlKey] = value
+            }
+        }
+    }
+
+    override val trackFinishedActionFlow: Flow<TrackFinishedAction?> =
+        dataStore.data
+            .map { prefs ->
+                val value = prefs[trackFinishedActionKey] ?: return@map null
+                TrackFinishedAction.values().find { it.key == value }
+            }
+            .distinctUntilChanged()
+
+    override suspend fun updateTrackFinishedAction(
+        value: TrackFinishedAction?
+    ) {
+        dataStore.edit {
+            if (value == null) {
+                it.remove(trackFinishedActionKey)
+            } else {
+                it[trackFinishedActionKey] = value.key
             }
         }
     }

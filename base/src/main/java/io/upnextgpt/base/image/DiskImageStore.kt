@@ -31,8 +31,8 @@ class DiskImageStore(
         key: String,
         quality: Int = 85,
     ) = withContext(dispatcher) {
-        diskCache.edit(key).let {
-            it.newOutputStream(0)?.use { out ->
+        diskCache.edit(key)?.let {
+            it.newOutputStream(0).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)
             }
             it.commit()

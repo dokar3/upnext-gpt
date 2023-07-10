@@ -6,11 +6,14 @@ import io.upnextgpt.data.api.Api
 import io.upnextgpt.data.api.TrackService
 import io.upnextgpt.data.api.service
 import io.upnextgpt.data.settings.Settings
+import io.upnextgpt.data.settings.TrackFinishedAction
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -24,26 +27,35 @@ class SettingsViewModel(
     val uiState: StateFlow<SettingsUiState> = _uiState
 
     init {
-        listenApiBaseUrlChanges()
+        listenSettingsChanges()
         updatePlayerConnectionStatus()
     }
 
-    private fun listenApiBaseUrlChanges() = viewModelScope.launch(dispatcher) {
-        settings.apiBaseUrlFlow.collect { baseUrl ->
-            _uiState.update {
-                it.copy(
-                    apiBaseUrl = baseUrl ?: Api.BASE_URL,
-                    testResultMessage = null,
-                    isTestingApiBaseUrl = false,
-                    isApiBaseUrlWorkingProperly = null,
-                )
+    private fun listenSettingsChanges() = viewModelScope.launch(dispatcher) {
+        combine(
+            settings.apiBaseUrlFlow,
+            settings.trackFinishedActionFlow,
+            transform = { baseUrl, action ->
+                baseUrl to action
             }
-        }
+        )
+            .distinctUntilChanged()
+            .collect { change ->
+                _uiState.update {
+                    it.copy(
+                        apiBaseUrl = change.first ?: Api.BASE_URL,
+                        testResultMessage = null,
+                        isTestingApiBaseUrl = false,
+                        isApiBaseUrlWorkingProperly = null,
+                        trackFinishedAction = change.second,
+                    )
+                }
+            }
     }
 
     fun updatePlayerConnectionStatus() = viewModelScope.launch(dispatcher) {
         _uiState.update {
-            it.copy(isConnectedToPlayers  = player.isConnected())
+            it.copy(isConnectedToPlayers = player.isConnected())
         }
     }
 
@@ -76,5 +88,11 @@ class SettingsViewModel(
                 isApiBaseUrlWorkingProperly = result?.ok == true,
             )
         }
+    }
+
+    fun updateTrackFinishedAction(
+        action: TrackFinishedAction
+    ) = viewModelScope.launch(dispatcher) {
+        settings.updateTrackFinishedAction(action)
     }
 }

@@ -24,9 +24,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import io.upnextgpt.ui.settings.items.AboutItem
 import io.upnextgpt.ui.settings.items.ApiBaseUrlItem
+import io.upnextgpt.ui.settings.items.PlaybackItem
 import io.upnextgpt.ui.settings.items.ServiceConnectionItem
 import io.upnextgpt.ui.settings.viewmodel.SettingsViewModel
-import io.upnextgpt.ui.shared.compose.rememberLifecycleEvent
+import io.upnextgpt.ui.shared.remember.rememberLifecycleEvent
 import io.upnextgpt.ui.shared.widget.TitleBar
 import org.koin.androidx.compose.koinViewModel
 
@@ -40,7 +41,7 @@ fun SettingsScreen(
 
     val itemModifier = Modifier
         .clip(MaterialTheme.shapes.medium)
-        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
+        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
         .border(
             width = 1.dp,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
@@ -87,6 +88,16 @@ fun SettingsScreen(
                     isUrlWorkingProperly = uiState.isApiBaseUrlWorkingProperly,
                     onTestClick = viewModel::testApiBaseUrl,
                     onSubmit = viewModel::updateApiBaseUrl,
+                    modifier = itemModifier,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            itemWithTitle("Playback") {
+                PlaybackItem(
+                    trackFinishedAction = uiState.trackFinishedAction,
+                    onUpdateTrackFinishedAction =
+                    viewModel::updateTrackFinishedAction,
                     modifier = itemModifier,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
