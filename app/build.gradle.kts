@@ -1,3 +1,5 @@
+import java.util.Properties
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
@@ -21,12 +23,42 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+    signingConfigs {
+        create("release").apply {
+            val properties = Properties()
+            val localProps = rootProject.file("local.properties")
+            if (localProps.exists()) {
+                properties.load(localProps.inputStream())
+            }
+            val path = envOrProp(properties, "KEYSTORE_PATH")
+            var keystoreFile = rootProject.file(path)
+            if (!keystoreFile.exists()) {
+                keystoreFile = file(path)
+            }
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = envOrProp(properties, "KEYSTORE_PASSWORD")
+                keyAlias = "key0"
+                keyPassword = envOrProp(properties, "KEYSTORE_KEY_PASSWORD")
+            }
         }
     }
+
+    buildTypes {
+        debug {
+            signingConfig = signingConfigs["release"]
+        }
+
+        release {
+            isMinifyEnabled = true
+            signingConfig = signingConfigs["release"]
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -70,4 +102,8 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+}
+
+fun envOrProp(props: Properties, propName: String): String {
+    return System.getenv(propName) ?: props.getProperty(propName)
 }
