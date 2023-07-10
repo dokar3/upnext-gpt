@@ -14,6 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -31,7 +32,7 @@ class NotificationBasedPlayer(
 
     private var currPlaybackInfo: PlaybackInfo? = null
     private val playbackInfoFlow = MutableSharedFlow<PlaybackInfo?>()
-    private val playbackEventFlow = MutableSharedFlow<PlaybackEvent>()
+    private val playbackEventFlow = MutableSharedFlow<PlaybackEvent?>()
 
     private var listenToFinishJob: Job? = null
 
@@ -114,8 +115,11 @@ class NotificationBasedPlayer(
     private fun triggerPlaybackEventsIfNeeded(info: PlaybackInfo?) {
         info ?: return
         listenToFinishJob?.cancel()
-        if (info.playState != PlayState.Playing) return
         coroutineScope.launch {
+            if (info.playState != PlayState.Playing) {
+                playbackEventFlow.emit(null)
+                return@launch
+            }
             if (info.position < 50) {
                 playbackEventFlow.emit(PlaybackEvent.TrackStarted)
             }
@@ -215,7 +219,9 @@ class NotificationBasedPlayer(
     }
 
     override fun playbackEventFlow(): Flow<PlaybackEvent> {
-        return playbackEventFlow.distinctUntilChanged()
+        return playbackEventFlow
+            .distinctUntilChanged()
+            .filterNotNull()
     }
 
     override fun destroy() {
