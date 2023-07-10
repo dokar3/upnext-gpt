@@ -112,12 +112,8 @@ class HomeViewModel(
 
     private fun addTrackToQueue(track: Track) {
         val list = playerQueue.value.toMutableList()
-        val idx = list.indexOfFirst { it.id == track.id }
-        if (idx != -1) {
-            list[idx] = track
-        } else {
-            list.add(0, track)
-        }
+        list.remove { it.id == track.id }
+        list.add(0, track)
         _playerQueue.update { list }
     }
 
