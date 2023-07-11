@@ -2,9 +2,11 @@ package io.upnextgpt.ui.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.upnextgpt.base.util.isHttpUrl
 import io.upnextgpt.data.api.Api
 import io.upnextgpt.data.api.TrackService
 import io.upnextgpt.data.api.service
+import io.upnextgpt.data.model.ApiResponse
 import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.data.settings.TrackFinishedAction
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
@@ -64,6 +66,16 @@ class SettingsViewModel(
     }
 
     fun updateApiBaseUrl(url: String?) = viewModelScope.launch(dispatcher) {
+        if (url != null && !url.isHttpUrl()) {
+            _uiState.update {
+                it.copy(
+                    apiBaseUrl = url,
+                    testResultMessage = "Unsupported URL",
+                    isApiBaseUrlWorkingProperly = false,
+                )
+            }
+            return@launch
+        }
         settings.updateApiBaseUrl(url?.ifEmpty { null })
     }
 
@@ -75,17 +87,20 @@ class SettingsViewModel(
                 isApiBaseUrlWorkingProperly = null,
             )
         }
-        val service = api.service<TrackService>()
         val result = try {
-            service.status()
+            api.service<TrackService>().status()
         } catch (e: Exception) {
-            null
+            ApiResponse(
+                ok = false,
+                message = e.message,
+                data = null,
+            )
         }
         _uiState.update {
             it.copy(
-                testResultMessage = result?.message,
+                testResultMessage = result.message,
                 isTestingApiBaseUrl = false,
-                isApiBaseUrlWorkingProperly = result?.ok == true,
+                isApiBaseUrlWorkingProperly = result.ok,
             )
         }
     }
