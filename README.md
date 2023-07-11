@@ -1,4 +1,9 @@
 # UpNext GPT
+
+<p align="center">
+    <img src="./images/web-icon.png" width="128" alt="App icon"/>
+</p>
+
 Your playlist, powered by ChatGPT, fully open-sourced.
 
 <a href="./images/screenshot-home.jpg"><img src="./images/screenshot-home.jpg" width="32%"/></a>
