@@ -245,6 +245,16 @@ class HomeViewModel(
         controlOrLaunchPlayer { player.seek(position) }
     }
 
+    fun playPrev() {
+        val currTrack = uiState.value.currTrack ?: return
+        val queue = playerQueue.value
+        val currIndex = queue.indexOfFirst { it.id == currTrack.id }
+        if (currIndex == -1 || currIndex == queue.lastIndex) {
+            return
+        }
+        playTrack(queue[currIndex + 1])
+    }
+
     fun playTrack(track: Track) {
         val currPlayer = uiState.value.activePlayer ?: return
         appLauncher.playTrack(

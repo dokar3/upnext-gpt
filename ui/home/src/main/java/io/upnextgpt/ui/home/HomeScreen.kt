@@ -125,6 +125,7 @@ fun HomeScreen(
             onPause = viewModel::pause,
             onSeek = viewModel::seek,
             onSelectPlayer = viewModel::selectPlayer,
+            onPlayPrev = viewModel::playPrev,
             onPlayTrack = viewModel::playTrack,
             onClearError = viewModel::clearError,
             onFetchNextTrackClick = viewModel::fetchNextTrack,
@@ -152,6 +153,7 @@ private fun Player(
     onPause: () -> Unit,
     onSeek: (position: Long) -> Unit,
     onSelectPlayer: (meta: PlayerMeta) -> Unit,
+    onPlayPrev: ()->Unit,
     onPlayTrack: (track: Track) -> Unit,
     onFetchNextTrackClick: () -> Unit,
     onClearError: () -> Unit,
@@ -281,7 +283,7 @@ private fun Player(
                     isPlaying = uiState.isPlaying,
                     prevEnabled = true,
                     nextEnabled = uiState.nextTrack != null,
-                    onPrevClick = {},
+                    onPrevClick = onPlayPrev,
                     onPlayPauseClick = {
                         if (uiState.isPlaying) {
                             onPause()
