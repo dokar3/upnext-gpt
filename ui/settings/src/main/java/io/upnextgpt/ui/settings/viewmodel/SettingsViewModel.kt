@@ -2,6 +2,7 @@ package io.upnextgpt.ui.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.upnextgpt.base.util.isHttpUrl
 import io.upnextgpt.data.api.Api
 import io.upnextgpt.data.api.TrackService
 import io.upnextgpt.data.api.service
@@ -65,6 +66,16 @@ class SettingsViewModel(
     }
 
     fun updateApiBaseUrl(url: String?) = viewModelScope.launch(dispatcher) {
+        if (url != null && !url.isHttpUrl()) {
+            _uiState.update {
+                it.copy(
+                    apiBaseUrl = url,
+                    testResultMessage = "Unsupported URL",
+                    isApiBaseUrlWorkingProperly = false,
+                )
+            }
+            return@launch
+        }
         settings.updateApiBaseUrl(url?.ifEmpty { null })
     }
 
