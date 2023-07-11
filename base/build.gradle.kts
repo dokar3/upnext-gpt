@@ -41,7 +41,7 @@ android {
 
 dependencies {
 
-    implementation(platform("dev.chrisbanes.compose:compose-bom:2023.04.00-beta02"))
+    api(platform(libs.compose.bom.alpha))
 
     api(libs.koin)
     api(libs.coil)
