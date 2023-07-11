@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import io.upnextgpt.data.api.Api
 import io.upnextgpt.data.api.TrackService
 import io.upnextgpt.data.api.service
+import io.upnextgpt.data.model.ApiResponse
 import io.upnextgpt.data.settings.Settings
 import io.upnextgpt.data.settings.TrackFinishedAction
 import io.upnextgpt.remote.palyer.NotificationBasedPlayer
@@ -75,17 +76,20 @@ class SettingsViewModel(
                 isApiBaseUrlWorkingProperly = null,
             )
         }
-        val service = api.service<TrackService>()
         val result = try {
-            service.status()
+            api.service<TrackService>().status()
         } catch (e: Exception) {
-            null
+            ApiResponse(
+                ok = false,
+                message = e.message,
+                data = null,
+            )
         }
         _uiState.update {
             it.copy(
-                testResultMessage = result?.message,
+                testResultMessage = result.message,
                 isTestingApiBaseUrl = false,
-                isApiBaseUrlWorkingProperly = result?.ok == true,
+                isApiBaseUrlWorkingProperly = result.ok,
             )
         }
     }

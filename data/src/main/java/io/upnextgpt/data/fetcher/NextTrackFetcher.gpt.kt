@@ -12,8 +12,8 @@ class GptNextTrackFetcher(
     override suspend fun fetch(
         queue: List<Track>
     ): SealedResult<Track, Exception> {
-        val service = api.service<TrackService>()
         val res = try {
+            val service = api.service<TrackService>()
             val body = TrackService.NextTrackBody(
                 queue = queue.subList(
                     fromIndex = 0,
