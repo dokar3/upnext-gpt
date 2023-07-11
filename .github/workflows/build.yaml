@@ -85,11 +85,11 @@ jobs:
         with:
           generate_release_notes: true
           files: |
-            /app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/apk/release/app-release.apk
 
       - name: Upload APKs
         if: ${{ inputs.build_release_apks }}
         uses: actions/upload-artifact@v3
         with:
           name: "app-release-apks"
-          path: /app/build/outputs/apk/release/*.apk
+          path: app/build/outputs/apk/release/*.apk
