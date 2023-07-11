@@ -9,6 +9,7 @@ espresso-core = "3.5.1"
 lifecycle-runtime-ktx = "2.6.1"
 activity-compose = "1.7.2"
 compose-bom = "2023.06.01"
+compose-bom-alpha = "2023.07.00-alpha01"
 compose-compiler = "1.4.8"
 compose-navigation = "2.7.0-beta02"
 appcompat = "1.6.1"
@@ -36,6 +37,7 @@ lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtim
 
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
+compose-bom-alpha = { group = "dev.chrisbanes.compose", name = "compose-bom", version.ref = "compose-bom-alpha" }
 compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "compose-navigation" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 ui = { group = "androidx.compose.ui", name = "ui" }

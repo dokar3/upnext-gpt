@@ -1,0 +1,20 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+    with:
+      runner_os: macos-latest
+      check: true
+      build_release_apks: true
+      create_release_from_tag: true
+    secrets:
+      keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
+      keystore_password: ${{ secrets.KEYSTORE_PASSWORD }}
+      keystore_key_password: ${{ secrets.KEYSTORE_KEY_PASSWORD }}

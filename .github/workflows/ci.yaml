@@ -1,0 +1,18 @@
+name: Run CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check:
+    uses: ./.github/workflows/build.yaml
+    with:
+      runner_os: ubuntu-latest
+      check: true
+    secrets:
+      keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
+      keystore_password: ${{ secrets.KEYSTORE_PASSWORD }}
+      keystore_key_password: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
