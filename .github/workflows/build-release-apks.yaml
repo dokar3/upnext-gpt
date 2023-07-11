@@ -1,0 +1,16 @@
+name: Build release apks
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+    with:
+      runner_os: macos-latest
+      check: false
+      build_release_apks: true
+    secrets:
+      keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
+      keystore_password: ${{ secrets.KEYSTORE_PASSWORD }}
+      keystore_key_password: ${{ secrets.KEYSTORE_KEY_PASSWORD }}

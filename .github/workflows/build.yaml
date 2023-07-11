@@ -1,0 +1,95 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      runner_os:
+        required: true
+        type: string
+      check:
+        required: true
+        type: boolean
+      build_release_apks:
+        required: false
+        type: boolean
+        default: false
+      create_release_from_tag:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      keystore_base64:
+        required: true
+      keystore_password:
+        required: true
+      keystore_key_password:
+        required: true
+
+jobs:
+  build:
+    runs-on: ${{ inputs.runner_os }}
+    env:
+      KEYSTORE_PATH: ./release.jks
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run tests
+        if: ${{ inputs.check }}
+        run: ./gradlew check
+
+      - name: Decode keystore
+        if: ${{ inputs.build_release_apks }}
+        env:
+          ENCODED_KEYSTORE: ${{ secrets.keystore_base64 }}
+        run: |
+          if [ -z "$ENCODED_KEYSTORE" ]; then
+            echo "secret 'keystore_base64' is not set"
+            exit 1
+          fi
+          node ./scripts/fileBase64Converter.js str2f $ENCODED_KEYSTORE $KEYSTORE_PATH
+
+      - name: Build release APKs
+        if: ${{ inputs.build_release_apks }}
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.keystore_password }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.keystore_key_password }}
+          TWITTER_CLIENT_ID: ${{ secrets.twitter_client_id }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.unsplash_access_key }}
+        run: ./gradlew app:assembleRelease
+
+      - name: Cleanup keystore
+        if: always()
+        run: |
+          if [ -e "$KEYSTORE_PATH" ]; then
+            rm -f $KEYSTORE_PATH
+          fi
+
+      - name: Create release from tag
+        uses: softprops/action-gh-release@v1
+        if: ${{ (inputs.create_release_from_tag) && startsWith(github.ref, 'refs/tags/v') }}
+        with:
+          generate_release_notes: true
+          files: |
+            /app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload APKs
+        if: ${{ inputs.build_release_apks }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: "app-release-apks"
+          path: /app/build/outputs/apk/release/*.apk
