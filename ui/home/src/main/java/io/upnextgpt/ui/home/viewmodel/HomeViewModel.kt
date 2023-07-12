@@ -61,6 +61,7 @@ class HomeViewModel(
         listenPlaybackEvents()
         listenCurrTrack()
         listenNextTrack()
+        listenServiceEnabledState()
     }
 
     private fun listenCurrPlayer() = viewModelScope.launch(dispatcher) {
@@ -74,7 +75,6 @@ class HomeViewModel(
     }
 
     private fun listenPlaybackStates() = viewModelScope.launch(dispatcher) {
-        player.prepare()
         player.playbackInfoFlow().collect { info ->
             val packageName = info?.packageName
                 ?: uiState.value.activePlayer?.packageName
@@ -180,6 +180,32 @@ class HomeViewModel(
             }
     }
 
+    private fun listenServiceEnabledState() = viewModelScope.launch(
+        dispatcher
+    ) {
+        settings.serviceEnabledFlow.collect { enabled ->
+            if (enabled) {
+                if (!player.isPrepared()) {
+                    player.prepare()
+                }
+                _uiState.update { it.copy(isServiceEnabled = true) }
+            } else {
+                player.unobserve()
+                _uiState.update {
+                    it.copy(
+                        currTrack = null,
+                        nextTrack = null,
+                        isServiceEnabled = false,
+                        isPlaying = false,
+                        position = -1,
+                        duration = -1,
+                        albumArt = null,
+                    )
+                }
+            }
+        }
+    }
+
     private fun loadQueue() = viewModelScope.launch(dispatcher) {
         val list = trackRepo.getQueueTracks(queueId = null)
         _playerQueue.update { list }
@@ -211,7 +237,7 @@ class HomeViewModel(
         val isConnected = player.isConnected()
         _uiState.update { it.copy(isConnectedToPlayers = isConnected) }
         if (isConnected) {
-            if (!player.isPrepared()) {
+            if (!player.isPrepared() && uiState.value.isServiceEnabled) {
                 player.prepare()
             }
         } else {
@@ -231,6 +257,10 @@ class HomeViewModel(
 
     fun connectToPlayers() = viewModelScope.launch(dispatcher) {
         player.connect()
+    }
+
+    fun enabledService() = viewModelScope.launch(dispatcher) {
+        settings.updateServiceEnabledState(true)
     }
 
     fun pause() {
@@ -427,6 +457,6 @@ class HomeViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        player.destroy()
+        player.unobserve()
     }
 }

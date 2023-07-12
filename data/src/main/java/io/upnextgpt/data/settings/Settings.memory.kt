@@ -20,6 +20,9 @@ class MemorySettings : Settings {
     override val trackFinishedActionFlow: Flow<TrackFinishedAction?> =
         _trackFinishedActionFlow
 
+    private val _serviceEnabledFlow = MutableStateFlow(true)
+    override val serviceEnabledFlow: Flow<Boolean> = _serviceEnabledFlow
+
     override suspend fun updateCurrentPlayer(value: String?) {
         _currentPlayerFlow.value = value
     }
@@ -36,5 +39,9 @@ class MemorySettings : Settings {
         value: TrackFinishedAction?
     ) {
         _trackFinishedActionFlow.value = value
+    }
+
+    override suspend fun updateServiceEnabledState(value: Boolean) {
+        _serviceEnabledFlow.value = value
     }
 }

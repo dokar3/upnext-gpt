@@ -19,7 +19,7 @@ interface RemotePlayer : PlayerActions {
 
     fun playbackEventFlow(): Flow<PlaybackEvent>
 
-    fun destroy()
+    fun unobserve()
 
     enum class PlaybackEvent {
         TrackStarted,

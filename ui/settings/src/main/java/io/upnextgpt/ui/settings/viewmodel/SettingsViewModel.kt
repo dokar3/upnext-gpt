@@ -19,6 +19,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+private data class SettingsValues(
+    val apiBaseUrl: String?,
+    val trackFinishedAction: TrackFinishedAction?,
+    val serviceEnabled: Boolean,
+)
+
 class SettingsViewModel(
     private val player: NotificationBasedPlayer,
     private val api: Api,
@@ -37,19 +43,19 @@ class SettingsViewModel(
         combine(
             settings.apiBaseUrlFlow,
             settings.trackFinishedActionFlow,
-            transform = { baseUrl, action ->
-                baseUrl to action
-            }
+            settings.serviceEnabledFlow,
+            transform = ::SettingsValues
         )
             .distinctUntilChanged()
-            .collect { change ->
+            .collect { values ->
                 _uiState.update {
                     it.copy(
-                        apiBaseUrl = change.first ?: Api.BASE_URL,
+                        isServiceEnabled = values.serviceEnabled,
+                        apiBaseUrl = values.apiBaseUrl ?: Api.BASE_URL,
                         testResultMessage = null,
                         isTestingApiBaseUrl = false,
                         isApiBaseUrlWorkingProperly = null,
-                        trackFinishedAction = change.second,
+                        trackFinishedAction = values.trackFinishedAction,
                     )
                 }
             }
@@ -109,5 +115,11 @@ class SettingsViewModel(
         action: TrackFinishedAction
     ) = viewModelScope.launch(dispatcher) {
         settings.updateTrackFinishedAction(action)
+    }
+
+    fun updateServiceEnabledState(
+        value: Boolean
+    ) = viewModelScope.launch(dispatcher) {
+        settings.updateServiceEnabledState(value)
     }
 }

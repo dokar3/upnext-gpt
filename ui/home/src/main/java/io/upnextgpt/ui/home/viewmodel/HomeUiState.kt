@@ -37,6 +37,7 @@ internal val SupportedPlayers = listOf(
 data class HomeUiState(
     val players: List<PlayerMeta> = SupportedPlayers,
     val isConnectedToPlayers: Boolean = true,
+    val isServiceEnabled: Boolean = true,
     val currTrack: Track? = null,
     val isPlaying: Boolean = false,
     val position: Long = 0L,

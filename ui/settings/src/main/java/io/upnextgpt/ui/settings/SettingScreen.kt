@@ -26,7 +26,7 @@ import androidx.lifecycle.Lifecycle
 import io.upnextgpt.ui.settings.items.AboutItem
 import io.upnextgpt.ui.settings.items.ApiBaseUrlItem
 import io.upnextgpt.ui.settings.items.PlaybackItem
-import io.upnextgpt.ui.settings.items.ServiceConnectionItem
+import io.upnextgpt.ui.settings.items.ServiceItem
 import io.upnextgpt.ui.settings.viewmodel.SettingsViewModel
 import io.upnextgpt.ui.shared.remember.rememberLifecycleEvent
 import io.upnextgpt.ui.shared.widget.TitleBar
@@ -73,9 +73,12 @@ fun SettingsScreen(
             contentPadding = PaddingValues(16.dp),
         ) {
             itemWithTitle("Services") {
-                ServiceConnectionItem(
+                ServiceItem(
                     onConnectClick = viewModel::connectToPlayers,
+                    onUpdateServiceEnabledState =
+                    viewModel::updateServiceEnabledState,
                     isConnectedToPlayers = uiState.isConnectedToPlayers,
+                    isServiceEnabled = uiState.isServiceEnabled,
                     modifier = itemModifier,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
