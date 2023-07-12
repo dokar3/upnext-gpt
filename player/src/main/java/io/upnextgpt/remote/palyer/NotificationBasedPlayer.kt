@@ -224,7 +224,10 @@ class NotificationBasedPlayer(
             .filterNotNull()
     }
 
-    override fun destroy() {
+    override fun unobserve() {
+        isPrepared = false
+        activeNotifications = null
+        currPlaybackInfo = null
         Notifications.unregisterNotificationCallback(this)
         Notifications.unbindNotificationService(context)
     }

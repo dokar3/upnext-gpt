@@ -104,6 +104,16 @@ fun HomeScreen(
             )
         }
 
+        AnimatedVisibility(
+            visible = !uiState.isServiceEnabled,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+        ) {
+            ServiceNotEnabledBar(
+                onEnableClick = viewModel::enabledService,
+            )
+        }
+
         TitleBar(
             title = stringResource(R.string.app_name),
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -153,7 +163,7 @@ private fun Player(
     onPause: () -> Unit,
     onSeek: (position: Long) -> Unit,
     onSelectPlayer: (meta: PlayerMeta) -> Unit,
-    onPlayPrev: ()->Unit,
+    onPlayPrev: () -> Unit,
     onPlayTrack: (track: Track) -> Unit,
     onFetchNextTrackClick: () -> Unit,
     onClearError: () -> Unit,
@@ -342,6 +352,30 @@ private fun Player(
             onDislike = { onDislikeTrack(track) },
             onCancelDislike = { onCancelDislikeTrack(track) },
         )
+    }
+}
+
+@Composable
+private fun ServiceNotEnabledBar(
+    onEnableClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(text = "Service disabled.")
+
+        TextButton(
+            onClick = onEnableClick,
+            colors = ButtonDefaults.textButtonColors(contentColor = Color.White),
+        ) {
+            Text("Enable")
+        }
     }
 }
 

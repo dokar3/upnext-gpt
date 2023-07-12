@@ -6,6 +6,7 @@ import io.upnextgpt.data.settings.TrackFinishedAction
 @Immutable
 data class SettingsUiState(
     val isConnectedToPlayers: Boolean = true,
+    val isServiceEnabled: Boolean = true,
     val apiBaseUrl: String? = null,
     val isTestingApiBaseUrl: Boolean = false,
     val testResultMessage: String? = null,

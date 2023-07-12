@@ -3,6 +3,7 @@ package io.upnextgpt.data.settings
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -23,6 +24,8 @@ class SettingsImpl(private val dataStore: DataStore<Preferences>) : Settings {
 
     private val trackFinishedActionKey =
         stringPreferencesKey("track_finished_action")
+
+    private val serviceEnabledKey = booleanPreferencesKey("service_enabled")
 
     override val currentPlayerFlow: Flow<String?> = dataStore.data
         .map { it[currentPlayerKey] }
@@ -84,5 +87,13 @@ class SettingsImpl(private val dataStore: DataStore<Preferences>) : Settings {
                 it[trackFinishedActionKey] = value.key
             }
         }
+    }
+
+    override val serviceEnabledFlow: Flow<Boolean> = dataStore.data
+        .map { it[serviceEnabledKey] ?: true }
+        .distinctUntilChanged()
+
+    override suspend fun updateServiceEnabledState(value: Boolean) {
+        dataStore.edit { it[serviceEnabledKey] = value }
     }
 }

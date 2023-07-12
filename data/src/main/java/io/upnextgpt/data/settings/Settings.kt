@@ -7,6 +7,7 @@ interface Settings {
     val nextTrackIdFlow: Flow<Long?>
     val apiBaseUrlFlow: Flow<String?>
     val trackFinishedActionFlow: Flow<TrackFinishedAction?>
+    val serviceEnabledFlow: Flow<Boolean>
 
     suspend fun updateCurrentPlayer(value: String?)
 
@@ -15,4 +16,6 @@ interface Settings {
     suspend fun updateApiBaseUrl(value: String?)
 
     suspend fun updateTrackFinishedAction(value: TrackFinishedAction?)
+
+    suspend fun updateServiceEnabledState(value: Boolean)
 }
