@@ -1,6 +1,5 @@
 package io.upnextgpt.remote
 
-import android.text.TextUtils
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -10,13 +9,13 @@ import android.os.IBinder
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.text.TextUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import java.util.WeakHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-
 
 object Notifications {
     private const val ENABLED_NOTIFICATION_LISTENERS =
@@ -39,7 +38,7 @@ object Notifications {
         val flat: String = Settings.Secure.getString(
             context.contentResolver,
             ENABLED_NOTIFICATION_LISTENERS
-        )
+        ) ?: return false
         if (!TextUtils.isEmpty(flat)) {
             val names = flat.split(":").toTypedArray()
             for (i in names.indices) {
