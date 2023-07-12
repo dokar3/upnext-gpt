@@ -68,8 +68,6 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.keystore_password }}
           KEYSTORE_KEY_PASSWORD: ${{ secrets.keystore_key_password }}
-          TWITTER_CLIENT_ID: ${{ secrets.twitter_client_id }}
-          UNSPLASH_ACCESS_KEY: ${{ secrets.unsplash_access_key }}
         run: ./gradlew app:assembleRelease
 
       - name: Cleanup keystore
