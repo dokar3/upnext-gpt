@@ -18,3 +18,4 @@ jobs:
       keystore_base64: ${{ secrets.KEYSTORE_BASE64 }}
       keystore_password: ${{ secrets.KEYSTORE_PASSWORD }}
       keystore_key_password: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+      play_service_account_json: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
