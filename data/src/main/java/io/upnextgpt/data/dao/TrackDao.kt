@@ -35,6 +35,10 @@ class TrackDao(
         database.trackQueries.delete(id)
     }
 
+    suspend fun delete(ids: Collection<Long>) = withContext(dispatcher) {
+        database.trackQueries.deleteAllById(ids)
+    }
+
     suspend fun clearQueue(queueId: String?) = withContext(dispatcher) {
         database.trackQueries.clearQueue(queueId)
     }
