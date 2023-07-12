@@ -35,6 +35,10 @@ class TrackRepository(
         trackDao.delete(id)
     }
 
+    suspend fun delete(ids: Collection<Long>) {
+        trackDao.delete(ids)
+    }
+
     suspend fun clearQueue(queueId: String?) {
         trackDao.clearQueue(queueId)
     }

@@ -34,5 +34,8 @@ VALUES ?;
 delete:
 DELETE FROM track WHERE id = ?;
 
+deleteAllById:
+DELETE FROM track WHERE id IN ?;
+
 clearQueue:
 DELETE FROM track WHERE queueId = ?;

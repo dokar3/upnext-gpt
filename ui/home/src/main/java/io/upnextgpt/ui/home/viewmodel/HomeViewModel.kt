@@ -165,11 +165,20 @@ class HomeViewModel(
             }
     }
 
-    private fun addTrackToQueue(track: Track) {
+    private suspend fun addTrackToQueue(track: Track) {
         val list = playerQueue.value.toMutableList()
         list.remove { it.id == track.id }
         list.add(0, track)
-        _playerQueue.update { list }
+        if (list.size > MAX_QUEUE_SIZE) {
+            _playerQueue.update { list.subList(0, MAX_QUEUE_SIZE) }
+            val toRemove = list.subList(MAX_QUEUE_SIZE, list.size)
+            // Delete album arts
+            toRemove.forEach { diskImageStore.delete(it.id.toString()) }
+            // Delete db records
+            trackRepo.delete(toRemove.map { it.id })
+        } else {
+            _playerQueue.update { list }
+        }
     }
 
     private fun listenNextTrack() = viewModelScope.launch(dispatcher) {
@@ -458,5 +467,9 @@ class HomeViewModel(
     override fun onCleared() {
         super.onCleared()
         player.unobserve()
+    }
+
+    companion object {
+        private const val MAX_QUEUE_SIZE = 100
     }
 }
