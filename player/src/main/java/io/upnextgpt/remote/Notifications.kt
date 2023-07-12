@@ -1,22 +1,22 @@
 package io.upnextgpt.remote
 
-import android.text.TextUtils
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
+import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.text.TextUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import java.util.WeakHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-
 
 object Notifications {
     private const val ENABLED_NOTIFICATION_LISTENERS =
@@ -39,7 +39,7 @@ object Notifications {
         val flat: String = Settings.Secure.getString(
             context.contentResolver,
             ENABLED_NOTIFICATION_LISTENERS
-        )
+        ) ?: return false
         if (!TextUtils.isEmpty(flat)) {
             val names = flat.split(":").toTypedArray()
             for (i in names.indices) {
@@ -98,10 +98,19 @@ object Notifications {
             addAction(MediaNotificationService.ACTION_NOTIFICATION_REMOVED)
             addAction(MediaNotificationService.ACTION_ACTIVE_NOTIFICATIONS_UPDATED)
         }
-        context.applicationContext.registerReceiver(
-            NotificationReceiver(coroutineScope),
-            filter
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.applicationContext.registerReceiver(
+                NotificationReceiver(coroutineScope),
+                filter,
+                Context.RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
+            context.applicationContext.registerReceiver(
+                NotificationReceiver(coroutineScope),
+                filter
+            )
+        }
         isRegisteredBroadcast = true
     }
 

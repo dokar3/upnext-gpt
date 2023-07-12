@@ -3,6 +3,7 @@ package io.upnextgpt.ui.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -68,8 +69,8 @@ fun SettingsScreen(
 
         LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(16.dp),
         ) {
             itemWithTitle("Services") {
                 ServiceConnectionItem(
