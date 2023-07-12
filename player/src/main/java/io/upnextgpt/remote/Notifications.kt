@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
+import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
@@ -97,10 +98,19 @@ object Notifications {
             addAction(MediaNotificationService.ACTION_NOTIFICATION_REMOVED)
             addAction(MediaNotificationService.ACTION_ACTIVE_NOTIFICATIONS_UPDATED)
         }
-        context.applicationContext.registerReceiver(
-            NotificationReceiver(coroutineScope),
-            filter
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.applicationContext.registerReceiver(
+                NotificationReceiver(coroutineScope),
+                filter,
+                Context.RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
+            context.applicationContext.registerReceiver(
+                NotificationReceiver(coroutineScope),
+                filter
+            )
+        }
         isRegisteredBroadcast = true
     }
 
