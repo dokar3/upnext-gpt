@@ -1,5 +1,6 @@
 package com.dokar.upnextgpt
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -12,12 +13,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.upnextgpt.base.util.getActivity
 import io.upnextgpt.ui.home.HomeScreen
 import io.upnextgpt.ui.home.QueueScreen
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
@@ -75,6 +78,13 @@ fun AppNavGraph(
     homeViewModel: HomeViewModel = koinViewModel(),
 ) {
     val navController = rememberNavController()
+
+    val context = LocalContext.current
+
+    BackHandler {
+        homeViewModel.unobservePlayers()
+        context.getActivity()?.finish()
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         NavHost(

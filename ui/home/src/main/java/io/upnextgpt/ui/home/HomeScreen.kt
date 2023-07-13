@@ -82,9 +82,7 @@ fun HomeScreen(
     val isConnectedToPlayer = uiState.isConnectedToPlayers
 
     var isShowConnectToPlayersDialog by remember(isConnectedToPlayer) {
-        mutableStateOf(
-            false
-        )
+        mutableStateOf(false)
     }
 
     LaunchedEffect(viewModel, lifecycleEvent) {
@@ -246,7 +244,11 @@ private fun Player(
 
                 IconButton(
                     onClick = {
-                        scope.launch { trackMenuSheetState.expand() }
+                        scope.launch {
+                            if (uiState.currTrack != null) {
+                                trackMenuSheetState.expand()
+                            }
+                        }
                     }
                 ) {
                     Icon(

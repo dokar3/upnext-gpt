@@ -264,6 +264,10 @@ class HomeViewModel(
         }
     }
 
+    fun unobservePlayers() {
+        player.unobserve()
+    }
+
     fun connectToPlayers() = viewModelScope.launch(dispatcher) {
         player.connect()
     }
