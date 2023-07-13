@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -30,9 +31,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dokar.sheets.BottomSheet
-import com.dokar.sheets.BottomSheetDragHandle
 import com.dokar.sheets.BottomSheetState
+import com.dokar.sheets.m3.BottomSheet
 import io.upnextgpt.base.ImmutableHolder
 import io.upnextgpt.ui.home.viewmodel.PlayerMeta
 import io.upnextgpt.ui.shared.widget.CardButton
@@ -48,11 +48,10 @@ internal fun PlayerSelectorSheet(
     BottomSheet(
         state = state,
         modifier = modifier,
-        backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-        dragHandle = {
-            BottomSheetDragHandle(color = MaterialTheme.colorScheme.onSurface)
-        },
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.large.copy(
+            bottomStart = CornerSize(0.dp),
+            bottomEnd = CornerSize(0.dp),
+        ),
         skipPeeked = true,
     ) {
         LazyColumn(
