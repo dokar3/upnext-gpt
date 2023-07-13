@@ -82,9 +82,7 @@ fun HomeScreen(
     val isConnectedToPlayer = uiState.isConnectedToPlayers
 
     var isShowConnectToPlayersDialog by remember(isConnectedToPlayer) {
-        mutableStateOf(
-            false
-        )
+        mutableStateOf(false)
     }
 
     LaunchedEffect(viewModel, lifecycleEvent) {
