@@ -246,7 +246,11 @@ private fun Player(
 
                 IconButton(
                     onClick = {
-                        scope.launch { trackMenuSheetState.expand() }
+                        scope.launch {
+                            if (uiState.currTrack != null) {
+                                trackMenuSheetState.expand()
+                            }
+                        }
                     }
                 ) {
                     Icon(
