@@ -1,6 +1,7 @@
 package io.upnextgpt.ui.shared.widget
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -19,19 +20,17 @@ import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.drawOutline
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import io.upnextgpt.ui.shared.modifier.gradientBorder
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -52,7 +51,7 @@ enum class SnackbarType {
     Error,
 }
 
-fun SnackbarVisuals.typedBorderColorOrNull(): Color? {
+fun SnackbarVisuals.borderColorFromTypeOrNull(): Color? {
     val typedSnackbarVisuals = this as? TypedSnackbarVisuals
         ?: return null
     return when (typedSnackbarVisuals.type) {
@@ -66,27 +65,32 @@ fun SnackbarVisuals.typedBorderColorOrNull(): Color? {
 fun Modifier.snackbarShimmerBorder(
     color: Color,
     shape: Shape,
-): Modifier {
-    return drawWithCache {
-        val borderBrush = Brush.linearGradient(
+): Modifier = composed {
+    val gradientColors = remember(color) {
+        arrayOf(
             0f to color,
             0.8f to Color.Transparent,
-            start = Offset(size.width * 0.5f, 0f),
-            end = Offset(size.width * 0.55f, size.height),
         )
-        val outline = shape.createOutline(
-            size, layoutDirection, density = this,
-        )
-        val borderStroke = Stroke(width = 0.7.dp.toPx())
-        onDrawWithContent {
-            drawContent()
-            drawOutline(
-                outline = outline,
-                brush = borderBrush,
-                style = borderStroke,
-            )
-        }
     }
+
+    val degrees = remember { Animatable(-90f) }
+
+    LaunchedEffect(Unit) {
+        degrees.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(
+                durationMillis = 700,
+                delayMillis = 155,
+            ),
+        )
+    }
+
+    gradientBorder(
+        degrees = { degrees.value },
+        width = 0.7.dp,
+        shape = shape,
+        colorStops = gradientColors,
+    )
 }
 
 @Composable
@@ -101,7 +105,7 @@ fun ShimmerBorderSnackbar(
         modifier = modifier
             .padding(vertical = 16.dp)
             .snackbarShimmerBorder(
-                color = snackbarData.visuals.typedBorderColorOrNull()
+                color = snackbarData.visuals.borderColorFromTypeOrNull()
                     ?: contentColor,
                 shape = borderShape,
             ),

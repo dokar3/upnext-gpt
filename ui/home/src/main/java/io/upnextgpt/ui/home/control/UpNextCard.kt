@@ -33,19 +33,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawOutline
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.upnextgpt.data.model.Track
+import io.upnextgpt.ui.shared.modifier.gradientBorder
 import io.upnextgpt.ui.shared.widget.CardButton
-import kotlin.math.cos
-import kotlin.math.sin
 import io.upnextgpt.ui.shared.R as SharedR
 
 @Composable
@@ -128,7 +123,7 @@ fun UpNextCard(
 }
 
 @Composable
-fun SparklesImage(modifier: Modifier = Modifier) {
+private fun SparklesImage(modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(SharedR.drawable.fill_sparkles),
         contentDescription = null,
@@ -158,7 +153,7 @@ fun SparklesImage(modifier: Modifier = Modifier) {
     )
 }
 
-fun Modifier.loadingEffects(
+internal fun Modifier.loadingEffects(
     animating: Boolean,
     shape: Shape,
 ): Modifier = composed {
@@ -180,67 +175,18 @@ fun Modifier.loadingEffects(
         )
     }
 
-    graphicsLayer { alpha = 0.99f }.drawWithCache {
-        val animValue = animation.value
-
-        val outline = shape.createOutline(size, layoutDirection, this)
-
-        val points = calcLinearGradientPoints(
-            cx = size.width / 2,
-            cy = size.height / 2,
-            degrees = animValue * 360,
-            width = size.width,
-            height = size.height,
-        )
-        val borderBrush = Brush.linearGradient(
-            colors = listOf(Color.Transparent, Color.Transparent, Color.White),
-            start = Offset(points.startX, points.startY),
-            end = Offset(points.endX, points.endY),
-        )
-        val borderStroke = Stroke(
-            width = 4.dp.toPx(),
-            cap = StrokeCap.Round,
-            join = StrokeJoin.Round,
-        )
-
-        onDrawWithContent {
-            drawContent()
-            if (animating) {
-                // Border
-                drawOutline(
-                    outline = outline,
-                    brush = borderBrush,
-                    style = borderStroke,
-                )
-            }
-        }
+    if (!animating) {
+        return@composed this
     }
-}
 
-private data class GradientPoints(
-    val startX: Float,
-    val startY: Float,
-    val endX: Float,
-    val endY: Float
-)
-
-private fun calcLinearGradientPoints(
-    cx: Float,
-    cy: Float,
-    degrees: Float,
-    width: Float,
-    height: Float
-): GradientPoints {
-    val radians = Math.toRadians(degrees.toDouble())
-    val halfWidth = width / 2f
-    val halfHeight = height / 2f
-    val cos = cos(radians).toFloat()
-    val sin = sin(radians).toFloat()
-
-    val startX = cx + (-halfWidth * cos + halfHeight * sin)
-    val startY = cy + (-halfWidth * sin - halfHeight * cos)
-    val endX = cx + (halfWidth * cos + halfHeight * sin)
-    val endY = cy + (halfWidth * sin - halfHeight * cos)
-
-    return GradientPoints(startX, startY, endX, endY)
+    gradientBorder(
+        degrees = { animation.value * 360 },
+        width = 4.dp,
+        shape = shape,
+        colorStops = arrayOf(
+            0f to Color.Transparent,
+            0.33f to Color.Transparent,
+            1f to Color.White
+        )
+    )
 }
