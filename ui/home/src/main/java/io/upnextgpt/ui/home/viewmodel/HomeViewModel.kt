@@ -60,7 +60,6 @@ class HomeViewModel(
         listenPlaybackStates()
         listenPlaybackEvents()
         listenCurrTrack()
-        listenNextTrack()
         listenServiceEnabledState()
     }
 
@@ -181,14 +180,6 @@ class HomeViewModel(
         }
     }
 
-    private fun listenNextTrack() = viewModelScope.launch(dispatcher) {
-        uiState.map { it.nextTrack?.id }
-            .filterNotNull()
-            .collect { nextTrackId ->
-                settings.updateNextTrackId(nextTrackId)
-            }
-    }
-
     private fun listenServiceEnabledState() = viewModelScope.launch(
         dispatcher
     ) {
@@ -218,10 +209,6 @@ class HomeViewModel(
     private fun loadQueue() = viewModelScope.launch(dispatcher) {
         val list = trackRepo.getQueueTracks(queueId = null)
         _playerQueue.update { list }
-
-        val nextTrackId = settings.nextTrackIdFlow.firstOrNull()
-        val nextTrack = list.find { it.id == nextTrackId }
-        _uiState.update { it.copy(nextTrack = nextTrack) }
     }
 
     private fun updateDiskAlbumArt(

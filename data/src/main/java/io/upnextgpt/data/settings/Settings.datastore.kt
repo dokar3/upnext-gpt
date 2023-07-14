@@ -41,20 +41,6 @@ class SettingsImpl(private val dataStore: DataStore<Preferences>) : Settings {
         }
     }
 
-    override val nextTrackIdFlow: Flow<Long?> = dataStore.data
-        .map { it[nextTrackIdKey] }
-        .distinctUntilChanged()
-
-    override suspend fun updateNextTrackId(value: Long?) {
-        dataStore.edit {
-            if (value == null) {
-                it.remove(nextTrackIdKey)
-            } else {
-                it[nextTrackIdKey] = value
-            }
-        }
-    }
-
     override val apiBaseUrlFlow: Flow<String?> = dataStore.data
         .map { it[apiBaseUrlKey] }
         .distinctUntilChanged()
