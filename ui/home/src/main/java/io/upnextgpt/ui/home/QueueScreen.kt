@@ -33,7 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,6 +55,7 @@ import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.shared.dialog.BasicDialog
 import io.upnextgpt.ui.shared.widget.ShimmerBorderSnackbar
 import io.upnextgpt.ui.shared.widget.TitleBar
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import io.upnextgpt.ui.shared.R as SharedR
 
@@ -69,32 +69,33 @@ fun QueueScreen(
 
     val queue by viewModel.playerQueue.collectAsState()
 
-    val removedTrack by viewModel.removedTrack.collectAsState()
+    var trackToBeRemoved by remember { mutableStateOf<Track?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
     var isShowClearQueueDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(viewModel, removedTrack) {
-        val removed = removedTrack
-        if (removed != null) {
+    LaunchedEffect(viewModel, trackToBeRemoved) {
+        val track = trackToBeRemoved ?: return@LaunchedEffect
+        val index = queue.indexOf(track)
+        viewModel.removeTrackFromMemoryQueue(track)
+        launch {
             val result = snackbarHostState.showSnackbar(
-                message = "Removed '${removed.data.title}'",
+                message = "Removed '${track.title}'",
                 actionLabel = "Undo",
-                duration = SnackbarDuration.Long,
+                duration = SnackbarDuration.Short,
             )
             if (result == SnackbarResult.ActionPerformed) {
-                viewModel.insertTrackToQueue(
-                    track = removed.data,
-                    index = removed.index,
-                )
+                viewModel.insertTrackToMemoryQueue(track, index)
+            } else {
+                viewModel.removeTrackFromQueue(track)
             }
-            viewModel.clearRemovedTrack()
+            trackToBeRemoved = null
+        }.invokeOnCompletion { cause ->
+            if (cause != null) {
+                viewModel.removeTrackFromQueue(track)
+            }
         }
-    }
-
-    DisposableEffect(viewModel) {
-        onDispose { viewModel.clearRemovedTrack() }
     }
 
     Box {
@@ -124,7 +125,7 @@ fun QueueScreen(
                 nextTrack = uiState.nextTrack,
                 items = ImmutableHolder(queue),
                 onItemClick = viewModel::playTrack,
-                onDelete = viewModel::removeTrackFromQueue,
+                onDelete = { trackToBeRemoved = it },
                 currTrackId = uiState.currTrack?.id,
             )
         }

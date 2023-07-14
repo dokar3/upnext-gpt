@@ -49,9 +49,6 @@ class HomeViewModel(
     private val _playerQueue = MutableStateFlow<List<Track>>(emptyList())
     val playerQueue: StateFlow<List<Track>> = _playerQueue
 
-    private val _removedTrack = MutableStateFlow<RemovedTrack?>(null)
-    val removedTrack: StateFlow<RemovedTrack?> = _removedTrack
-
     init {
         loadQueue()
         updatePlayerList()
@@ -336,25 +333,25 @@ class HomeViewModel(
     fun removeTrackFromQueue(track: Track) = viewModelScope.launch(dispatcher) {
         trackRepo.delete(track.id)
         diskImageStore.delete(track.id.toString())
+        removeTrackFromMemoryQueue(track)
+    }
+
+    fun removeTrackFromMemoryQueue(track: Track) = viewModelScope.launch(
+        dispatcher
+    ) {
         val list = playerQueue.value.toMutableList()
         val index = list.remove { it.id == track.id }
         if (index != null) {
             _playerQueue.update { list }
-            _removedTrack.update { RemovedTrack(index = index, data = track) }
         }
     }
 
-    fun insertTrackToQueue(track: Track, index: Int) = viewModelScope.launch(
+    fun insertTrackToMemoryQueue(track: Track, index: Int) = viewModelScope.launch(
         dispatcher
     ) {
-        trackRepo.save(track)
         val list = playerQueue.value.toMutableList()
         list.add(index.coerceIn(0, list.size), track)
         _playerQueue.update { list }
-    }
-
-    fun clearRemovedTrack() {
-        _removedTrack.update { null }
     }
 
     fun selectPlayer(meta: PlayerMeta) = viewModelScope.launch(dispatcher) {
