@@ -250,7 +250,6 @@ class HomeViewModel(
                 player.prepare()
             }
         } else {
-            player.sync()
             _uiState.update {
                 it.copy(
                     currTrack = null,

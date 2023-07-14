@@ -157,7 +157,7 @@ class NotificationBasedPlayer(
                 Logger.e(TAG, "Cannot register notification callback")
             }
         }
-        updatePlaybackInfo(null)
+        updatePlaybackInfo(currPlaybackInfo)
         isPrepared = true
     }
 
@@ -226,8 +226,7 @@ class NotificationBasedPlayer(
 
     override fun unobserve() {
         isPrepared = false
-        activeNotifications = null
-        currPlaybackInfo = null
+        listenToFinishJob?.cancel()
         Notifications.unregisterNotificationCallback(this)
         Notifications.unbindNotificationService(context)
     }
