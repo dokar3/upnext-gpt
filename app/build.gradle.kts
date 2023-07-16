@@ -14,8 +14,8 @@ android {
         applicationId = "com.dokar.upnextgpt"
         minSdk = 21
         targetSdk = 33
-        versionCode = 5
-        versionName = "1.4"
+        versionCode = 6
+        versionName = "1.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -28,7 +28,9 @@ android {
             val properties = Properties()
             val localProps = rootProject.file("local.properties")
             if (localProps.exists()) {
-                properties.load(localProps.inputStream())
+                localProps.inputStream().use {
+                    properties.load(it)
+                }
             }
             val path = envOrProp(properties, "KEYSTORE_PATH")
             var keystoreFile = rootProject.file(path)
