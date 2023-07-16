@@ -11,20 +11,20 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.Lifecycle
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.upnextgpt.base.util.getActivity
 import io.upnextgpt.ui.home.HomeScreen
 import io.upnextgpt.ui.home.QueueScreen
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
 import io.upnextgpt.ui.settings.SettingsScreen
-import io.upnextgpt.ui.shared.remember.rememberLifecycleEvent
+import io.upnextgpt.ui.shared.compose.BackHandler2
 import org.koin.androidx.compose.koinViewModel
 
 private typealias TransitionScope = AnimatedContentTransitionScope<NavBackStackEntry>
@@ -79,12 +79,14 @@ fun AppNavGraph(
 ) {
     val navController = rememberNavController()
 
-    val lifecycleEvent = rememberLifecycleEvent()
+    val context = LocalContext.current
 
-    LaunchedEffect(homeViewModel, lifecycleEvent) {
-        if (lifecycleEvent == Lifecycle.Event.ON_STOP) {
-            homeViewModel.unobservePlayers()
-        }
+    @Suppress("deprecation")
+    BackHandler2 {
+        isEnabled = false
+        homeViewModel.unobservePlayers()
+        context.getActivity()?.onBackPressed()
+        isEnabled = true
     }
 
     Box(modifier = modifier.fillMaxSize()) {
