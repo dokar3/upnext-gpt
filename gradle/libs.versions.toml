@@ -1,6 +1,6 @@
 [versions]
 compileSdk = "34"
-agp = "8.2.0-alpha12"
+agp = "8.2.0-alpha15"
 kotlin = "1.8.22"
 core-ktx = "1.10.1"
 junit = "4.13.2"
