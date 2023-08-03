@@ -148,17 +148,22 @@ class NotificationBasedPlayer(
         if (!isConnected()) {
             return
         }
-        coroutineScope.launch {
-            val isBound = Notifications.bindNotificationServiceSync(context)
-            if (isBound) {
-                Notifications.registerNotificationCallback(this@NotificationBasedPlayer)
-                Notifications.queryActiveNotifications(context)
-            } else {
-                Logger.e(TAG, "Cannot register notification callback")
+        synchronized(this::class.java) {
+            if (isPrepared()) {
+                return@synchronized
             }
+            coroutineScope.launch {
+                val isBound = Notifications.bindNotificationServiceSync(context)
+                if (isBound) {
+                    Notifications.registerNotificationCallback(this@NotificationBasedPlayer)
+                    Notifications.queryActiveNotifications(context)
+                } else {
+                    Logger.e(TAG, "Cannot register notification callback")
+                }
+            }
+            updatePlaybackInfo(currPlaybackInfo)
+            isPrepared = true
         }
-        updatePlaybackInfo(currPlaybackInfo)
-        isPrepared = true
     }
 
     override fun isPrepared(): Boolean {

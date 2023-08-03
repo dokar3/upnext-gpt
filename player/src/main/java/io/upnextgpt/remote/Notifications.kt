@@ -8,7 +8,6 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
-import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.text.TextUtils
 import kotlinx.coroutines.CoroutineScope
@@ -64,10 +63,10 @@ object Notifications {
 
     fun bindNotificationServiceSync(
         context: Context,
-        timeout: Long = 5000L,
+        timeoutMillis: Long = 5000L,
     ): Boolean {
         val latch = CountDownLatch(1)
-        val intent = Intent(context, NotificationListenerService::class.java)
+        val intent = Intent(context, MediaNotificationService::class.java)
         val conn = object : ServiceConnection {
             override fun onServiceConnected(
                 name: ComponentName?,
@@ -86,7 +85,7 @@ object Notifications {
             registerNotificationBroadcastReceiver(context)
         }
 
-        return !latch.await(timeout, TimeUnit.MICROSECONDS)
+        return latch.await(timeoutMillis, TimeUnit.MILLISECONDS)
     }
 
     @Synchronized
