@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.upnextgpt.ui.shared.widget.CardButton
 import io.upnextgpt.ui.shared.R as SharedR
@@ -60,7 +61,11 @@ internal fun PlayerCard(
                     .padding(16.dp)
                     .height(48.dp),
             ) {
-                Text(playerName)
+                Text(
+                    text = playerName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
                 Icon(
                     painter = painterResource(
