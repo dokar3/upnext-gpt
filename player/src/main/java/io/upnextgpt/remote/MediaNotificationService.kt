@@ -12,16 +12,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MediaNotificationService : NotificationListenerService() {
+    private var isConnected = false
+
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            if (!isConnected) return
             val action = intent?.action ?: return
+            val notifications = activeNotifications
             coroutineScope.launch {
                 when (action) {
                     ACTION_QUERY_ACTIVE_NOTIFICATIONS -> {
-                        val sbns = activeNotifications
-                        Notifications.onActiveNotificationsUpdated(sbns)
+                        Notifications.onActiveNotificationsUpdated(notifications)
                     }
                 }
             }
@@ -29,8 +32,7 @@ class MediaNotificationService : NotificationListenerService() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        val binder = super.onBind(intent)
-        return binder
+        return super.onBind(intent)
     }
 
     override fun onCreate() {
@@ -50,11 +52,13 @@ class MediaNotificationService : NotificationListenerService() {
     }
 
     override fun onListenerConnected() {
+        isConnected = true
         Notifications.onListenerServiceConnected()
         Notifications.onActiveNotificationsUpdated(activeNotifications)
     }
 
     override fun onListenerDisconnected() {
+        isConnected = false
         Notifications.onListenerServiceDisconnected()
     }
 
