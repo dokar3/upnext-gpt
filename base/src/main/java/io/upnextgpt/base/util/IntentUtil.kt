@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager.NameNotFoundException
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.core.content.IntentCompat
 import io.upnextgpt.base.Logger
 import io.upnextgpt.base.SealedResult
 
@@ -49,6 +50,12 @@ object IntentUtil {
             Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 `package` = packageName
+                // https://developer.android.com/guide/components/intents-common#PlaySearch
+                putExtra(
+                    MediaStore.EXTRA_MEDIA_FOCUS,
+                    "vnd.android.cursor.item/audio"
+                )
+                putExtra(IntentCompat.EXTRA_START_PLAYBACK, true)
                 putExtra(MediaStore.EXTRA_MEDIA_TITLE, title)
                 putExtra(MediaStore.EXTRA_MEDIA_ARTIST, artist)
                 if (album != null) {
