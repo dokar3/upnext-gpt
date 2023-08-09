@@ -39,6 +39,14 @@ internal val SupportedPlayers = listOf(
         isActive = false,
         isInstalled = false
     ),
+    PlayerMeta(
+        packageName = "com.aspiro.tidal",
+        name = "Tidal",
+        iconRes = R.drawable.tidal,
+        themeColor = Color(0xFF161718),
+        isActive = false,
+        isInstalled = false
+    ),
 )
 
 @Immutable
