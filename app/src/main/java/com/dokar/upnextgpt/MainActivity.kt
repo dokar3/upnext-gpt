@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             UpNextGPTTheme(
                 darkTheme = true,
-                dynamicColor = false,
+                dynamicColor = true,
             ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
