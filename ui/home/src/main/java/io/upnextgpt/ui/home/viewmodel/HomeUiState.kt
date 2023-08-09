@@ -34,7 +34,7 @@ internal val SupportedPlayers = listOf(
     PlayerMeta(
         packageName = "app.revanced.android.apps.youtube.music",
         name = "YT Music ReVanced",
-        iconRes = R.drawable.youtube_music,
+        iconRes = R.drawable.revanced_yt_music,
         themeColor = Color(0xFFF9061B),
         isActive = false,
         isInstalled = false
