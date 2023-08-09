@@ -6,5 +6,6 @@
         <package android:name="com.google.android.apps.youtube.music" />
         <package android:name="app.revanced.android.apps.youtube.music" />
         <package android:name="com.aspiro.tidal" />
+        <package android:name="deezer.android.app" />
     </queries>
 </manifest>

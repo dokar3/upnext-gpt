@@ -47,6 +47,14 @@ internal val SupportedPlayers = listOf(
         isActive = false,
         isInstalled = false
     ),
+    PlayerMeta(
+        packageName = "deezer.android.app",
+        name = "Deezer",
+        iconRes = R.drawable.deezer,
+        themeColor = Color(0xFF121216),
+        isActive = false,
+        isInstalled = false
+    ),
 )
 
 @Immutable
