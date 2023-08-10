@@ -20,6 +20,9 @@ class MemorySettings : Settings {
     private val _serviceEnabledFlow = MutableStateFlow(true)
     override val serviceEnabledFlow: Flow<Boolean> = _serviceEnabledFlow
 
+    private val _dynamicColorEnabledFlow = MutableStateFlow(false)
+    override val dynamicColorEnabledFlow: Flow<Boolean> = _dynamicColorEnabledFlow
+
     override suspend fun updateCurrentPlayer(value: String?) {
         _currentPlayerFlow.value = value
     }
@@ -36,5 +39,9 @@ class MemorySettings : Settings {
 
     override suspend fun updateServiceEnabledState(value: Boolean) {
         _serviceEnabledFlow.value = value
+    }
+
+    override suspend fun updateDynamicColorEnabledState(value: Boolean) {
+        _dynamicColorEnabledFlow.value = value
     }
 }

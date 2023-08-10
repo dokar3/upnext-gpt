@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private data class SettingsValues(
+    val dynamicColorEnabled: Boolean,
     val apiBaseUrl: String?,
     val trackFinishedAction: TrackFinishedAction?,
     val serviceEnabled: Boolean,
@@ -41,6 +42,7 @@ class SettingsViewModel(
 
     private fun listenSettingsChanges() = viewModelScope.launch(dispatcher) {
         combine(
+            settings.dynamicColorEnabledFlow,
             settings.apiBaseUrlFlow,
             settings.trackFinishedActionFlow,
             settings.serviceEnabledFlow,
@@ -50,6 +52,7 @@ class SettingsViewModel(
             .collect { values ->
                 _uiState.update {
                     it.copy(
+                        isDynamicColorEnabled = values.dynamicColorEnabled,
                         isServiceEnabled = values.serviceEnabled,
                         apiBaseUrl = values.apiBaseUrl ?: Api.BASE_URL,
                         testResultMessage = null,
@@ -121,5 +124,11 @@ class SettingsViewModel(
         value: Boolean
     ) = viewModelScope.launch(dispatcher) {
         settings.updateServiceEnabledState(value)
+    }
+
+    fun updateDynamicColorEnabledState(
+        value: Boolean
+    ) = viewModelScope.launch(dispatcher) {
+        settings.updateDynamicColorEnabledState(value)
     }
 }

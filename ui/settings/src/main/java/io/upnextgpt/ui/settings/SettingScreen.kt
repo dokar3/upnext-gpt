@@ -27,6 +27,7 @@ import io.upnextgpt.ui.settings.items.AboutItem
 import io.upnextgpt.ui.settings.items.ApiBaseUrlItem
 import io.upnextgpt.ui.settings.items.PlaybackItem
 import io.upnextgpt.ui.settings.items.ServiceItem
+import io.upnextgpt.ui.settings.items.UiItem
 import io.upnextgpt.ui.settings.viewmodel.SettingsViewModel
 import io.upnextgpt.ui.shared.remember.rememberLifecycleEvent
 import io.upnextgpt.ui.shared.widget.TitleBar
@@ -72,6 +73,15 @@ fun SettingsScreen(
                 .fillMaxWidth(),
             contentPadding = PaddingValues(16.dp),
         ) {
+            itemWithTitle("UI") {
+                UiItem(
+                    isDynamicColorEnabled = uiState.isDynamicColorEnabled,
+                    onUpdateServiceEnabledState =
+                    viewModel::updateDynamicColorEnabledState,
+                    modifier = itemModifier,
+                )
+            }
+
             itemWithTitle("Services") {
                 ServiceItem(
                     onConnectClick = viewModel::connectToPlayers,
