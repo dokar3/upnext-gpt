@@ -7,6 +7,7 @@ interface Settings {
     val apiBaseUrlFlow: Flow<String?>
     val trackFinishedActionFlow: Flow<TrackFinishedAction?>
     val serviceEnabledFlow: Flow<Boolean>
+    val dynamicColorEnabledFlow: Flow<Boolean>
 
     suspend fun updateCurrentPlayer(value: String?)
 
@@ -15,4 +16,6 @@ interface Settings {
     suspend fun updateTrackFinishedAction(value: TrackFinishedAction?)
 
     suspend fun updateServiceEnabledState(value: Boolean)
+
+    suspend fun updateDynamicColorEnabledState(value: Boolean)
 }

@@ -27,6 +27,9 @@ class SettingsImpl(private val dataStore: DataStore<Preferences>) : Settings {
 
     private val serviceEnabledKey = booleanPreferencesKey("service_enabled")
 
+    private val dynamicColorEnabledKey =
+        booleanPreferencesKey("dynamic_color_enabled")
+
     override val currentPlayerFlow: Flow<String?> = dataStore.data
         .map { it[currentPlayerKey] }
         .distinctUntilChanged()
@@ -81,5 +84,13 @@ class SettingsImpl(private val dataStore: DataStore<Preferences>) : Settings {
 
     override suspend fun updateServiceEnabledState(value: Boolean) {
         dataStore.edit { it[serviceEnabledKey] = value }
+    }
+
+    override val dynamicColorEnabledFlow: Flow<Boolean> = dataStore.data
+        .map { it[dynamicColorEnabledKey] ?: false }
+        .distinctUntilChanged()
+
+    override suspend fun updateDynamicColorEnabledState(value: Boolean) {
+        dataStore.edit { it[dynamicColorEnabledKey] = value }
     }
 }
