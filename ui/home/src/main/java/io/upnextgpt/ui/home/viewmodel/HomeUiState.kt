@@ -34,8 +34,24 @@ internal val SupportedPlayers = listOf(
     PlayerMeta(
         packageName = "app.revanced.android.apps.youtube.music",
         name = "YT Music ReVanced",
-        iconRes = R.drawable.youtube_music,
+        iconRes = R.drawable.revanced_yt_music,
         themeColor = Color(0xFFF9061B),
+        isActive = false,
+        isInstalled = false
+    ),
+    PlayerMeta(
+        packageName = "com.aspiro.tidal",
+        name = "Tidal",
+        iconRes = R.drawable.tidal,
+        themeColor = Color(0xFF161718),
+        isActive = false,
+        isInstalled = false
+    ),
+    PlayerMeta(
+        packageName = "deezer.android.app",
+        name = "Deezer",
+        iconRes = R.drawable.deezer,
+        themeColor = Color(0xFF121216),
         isActive = false,
         isInstalled = false
     ),
