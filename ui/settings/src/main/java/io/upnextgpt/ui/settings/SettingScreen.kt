@@ -80,6 +80,7 @@ fun SettingsScreen(
                     viewModel::updateDynamicColorEnabledState,
                     modifier = itemModifier,
                 )
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             itemWithTitle("Services") {
