@@ -1,6 +1,7 @@
 package io.upnextgpt.ui.settings.items
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Divider
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,9 +24,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import io.upnextgpt.base.ImmutableHolder
 import io.upnextgpt.base.util.IntentUtil
+import io.upnextgpt.ui.settings.Contributor
+import io.upnextgpt.ui.settings.GH_CONTRIBUTORS
 import io.upnextgpt.ui.shared.R as SharedR
 
 private data class SocialItem(
@@ -49,59 +56,120 @@ private val SocialItems = listOf(
     )
 )
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun AboutItem(
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-
     Column(
         modifier = modifier
             .padding(8.dp)
             .fillMaxWidth(),
     ) {
-        Text("Open-sourced, by dokar")
+        Text("Open-sourced by dokar")
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Divider(
+        Spacer(modifier = Modifier.height(8.dp))
+
+        SocialItemList(items = ImmutableHolder(SocialItems))
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        HorizontalDivider(
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.24f)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            SocialItems.forEach { item ->
-                Column(
+        Text(text = "Contributors")
+
+        ContributorList(items = ImmutableHolder(GH_CONTRIBUTORS))
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SocialItemList(
+    items: ImmutableHolder<List<SocialItem>>,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        items.value.forEach { item ->
+            Column(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable {
+                        IntentUtil.openUrl(context, item.url)
+                    }
+                    .padding(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Image(
+                    painter = painterResource(item.iconRes),
+                    contentDescription = item.name,
+                    modifier = Modifier.size(36.dp),
+                    colorFilter = ColorFilter.tint(
+                        item.color
+                            ?: MaterialTheme.colorScheme.onBackground,
+                    ),
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = item.name,
+                    fontSize = 14.sp,
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ContributorList(
+    items: ImmutableHolder<List<Contributor>>,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        items.value.forEach { item ->
+            Column(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable {
+                        IntentUtil.openUrl(context, item.url)
+                    }
+                    .padding(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AsyncImage(
+                    model = item.avatar,
+                    contentDescription = null,
                     modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            IntentUtil.openUrl(context, item.url)
-                        }
-                        .padding(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(
-                        painter = painterResource(item.iconRes),
-                        contentDescription = item.name,
-                        modifier = Modifier.size(36.dp),
-                        colorFilter = ColorFilter.tint(
-                            item.color
-                                ?: MaterialTheme.colorScheme.onBackground,
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(
+                            MaterialTheme.colorScheme
+                                .onBackground.copy(alpha = 0.1f)
                         ),
-                    )
+                )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = item.name,
-                        fontSize = 14.sp,
-                    )
-                }
+                Text(
+                    text = item.name,
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }
