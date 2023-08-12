@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -104,7 +104,7 @@ internal fun ServiceItem(
             }
         }
 
-        Divider(modifier = Modifier.padding(8.dp))
+        HorizontalDivider(modifier = Modifier.padding(8.dp))
 
         Row(
             modifier = Modifier
