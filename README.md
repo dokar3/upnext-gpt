@@ -16,11 +16,13 @@ Deploy your own API backend: [upnext-gpt-web](https://github.com/dokar3/upnext-g
 
 - Recommend the next track using GPT
 - Customizable API backend
-- Control your players: Apple Music, Spotify, and Youtube Music
+- Control your players: Apple Music, Spotify, Youtube Music and more
 - Play queue
 - All UI written in Jetpack Compose
 
 # Downloads
+
+[Google Play](https://play.google.com/store/apps/details?id=com.dokar.upnextgpt)
 
 [Github Releases](https://github.com/dokar3/upnext-gpt/releases)
 
