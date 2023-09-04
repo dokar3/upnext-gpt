@@ -33,7 +33,7 @@ jobs:
     env:
       KEYSTORE_PATH: ./release.jks
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up node.js
         uses: actions/setup-node@v3
