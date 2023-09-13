@@ -41,7 +41,7 @@ android {
 
 dependencies {
 
-    api(platform(libs.compose.bom.alpha))
+    api(platform(libs.compose.bom))
 
     api(libs.koin)
     api(libs.coil)
