@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload build outputs
         if: ${{ inputs.build_release_apks || ((inputs.create_release_from_tag) && startsWith(github.ref, 'refs/tags/v')) }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-build-outputs
           path: app/build/outputs
