@@ -23,7 +23,7 @@ ksp = "1.9.22-1.0.17"
 moshi = "1.15.1"
 retrofit = "2.9.0"
 sqldelight = "2.0.1"
-coil = "2.5.0"
+coil = "2.6.0"
 diskLruCache = "2.0.2"
 
 [libraries]
