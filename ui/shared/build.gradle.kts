@@ -42,10 +42,10 @@ android {
 dependencies {
     implementation(projects.base)
 
-    implementation(libs.ui)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.tooling.preview)
-    implementation(libs.material3)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
     implementation(libs.androidx.lifecycle.common)
     implementation(libs.activity.compose)
     testImplementation(libs.junit)
