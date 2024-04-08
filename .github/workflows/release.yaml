@@ -10,7 +10,7 @@ jobs:
   build:
     uses: ./.github/workflows/build.yaml
     with:
-      runner_os: macos-latest
+      runner_os: ubuntu-latest
       check: true
       build_release_apks: true
       create_release_from_tag: true

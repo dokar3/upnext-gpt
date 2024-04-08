@@ -7,7 +7,7 @@ jobs:
   build:
     uses: ./.github/workflows/build.yaml
     with:
-      runner_os: macos-latest
+      runner_os: ubuntu-latest
       check: false
       build_release_apks: true
     secrets:
