@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,10 +26,11 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -249,7 +248,7 @@ private fun TrackItem(
 ) {
     val density = LocalDensity.current
 
-    val swipeToDismissState = rememberDismissState(
+    val swipeToDismissState = rememberSwipeToDismissBoxState(
         positionalThreshold = { with(density) { 96.dp.toPx() } },
     )
 
@@ -266,19 +265,16 @@ private fun TrackItem(
         if (!shouldListenSwipeValue) {
             return@LaunchedEffect
         }
-        if (currValue == DismissValue.DismissedToStart) {
+        if (currValue == SwipeToDismissBoxValue.EndToStart) {
             onDelete()
         }
     }
 
-    SwipeToDismiss(
+    SwipeToDismissBox(
         state = swipeToDismissState,
-        directions = if (swipeable) {
-            setOf(DismissDirection.EndToStart)
-        } else {
-            emptySet()
-        },
-        background = {
+        enableDismissFromEndToStart = swipeable,
+        enableDismissFromStartToEnd = false,
+        backgroundContent = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -293,7 +289,7 @@ private fun TrackItem(
                 )
             }
         },
-        dismissContent = {
+        content = {
             Box(
                 modifier = Modifier
                     .height(IntrinsicSize.Max)
