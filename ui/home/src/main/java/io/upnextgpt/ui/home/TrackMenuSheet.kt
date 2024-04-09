@@ -134,10 +134,7 @@ private fun RateView(
                         onLike()
                     }
                 }
-                .padding(
-                    horizontal = 8.dp,
-                    vertical = 16.dp,
-                ),
+                .padding(16.dp),
             contentAlignment = Alignment.Center,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -178,7 +175,7 @@ private fun RateView(
                         onDislike()
                     }
                 }
-                .padding(8.dp),
+                .padding(16.dp),
             contentAlignment = Alignment.Center,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
