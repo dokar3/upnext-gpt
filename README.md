@@ -13,9 +13,7 @@ Your playlist, powered by ChatGPT, fully open-sourced.
 <a href="./images/screenshot-queue.jpg"><img src="./images/screenshot-queue.jpg" width="32%"/></a>
 <a href="./images/screenshot-settings.jpg"><img src="./images/screenshot-settings.jpg" width="32%"/></a>
 
-**The default API backend server is not currently available.**
-
-**Please deploy your own API backend: [upnext-gpt-web](https://github.com/dokar3/upnext-gpt-web)**
+**Deploy your own API backend: [upnext-gpt-web](https://github.com/dokar3/upnext-gpt-web)**
 
 # Features
 
