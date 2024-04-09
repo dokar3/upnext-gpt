@@ -13,10 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +34,7 @@ import io.upnextgpt.base.ImmutableHolder
 import io.upnextgpt.base.util.IntentUtil
 import io.upnextgpt.ui.settings.Contributor
 import io.upnextgpt.ui.settings.GH_CONTRIBUTORS
+import io.upnextgpt.base.R as BaseR
 import io.upnextgpt.ui.shared.R as SharedR
 
 private data class SocialItem(
@@ -60,26 +63,36 @@ private val SocialItems = listOf(
 internal fun AboutItem(
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val versionName = remember {
+        context.packageManager
+            .getPackageInfo(context.packageName, 0)
+            .versionName
+    }
+
     Column(
         modifier = modifier
             .padding(8.dp)
             .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Text("Open-sourced by dokar")
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(text = stringResource(BaseR.string.app_name))
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Version: $versionName", fontSize = 14.sp)
+        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        SocialItemList(items = ImmutableHolder(SocialItems))
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Divider(
+        HorizontalDivider(
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.24f)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Text("Open-sourced by dokar")
+
+        SocialItemList(items = ImmutableHolder(SocialItems))
+
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.24f)
+        )
 
         Text(text = "Contributors")
 
