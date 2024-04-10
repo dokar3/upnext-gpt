@@ -2,6 +2,7 @@ package io.upnextgpt.ui.home.control
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -77,7 +77,7 @@ internal fun PlayerCard(
                             interactionSource = remember {
                                 MutableInteractionSource()
                             },
-                            indication = rememberRipple(radius = 12.dp),
+                            indication = LocalIndication.current,
                             onClick = onLaunchPlayerClick,
                         )
                 )
