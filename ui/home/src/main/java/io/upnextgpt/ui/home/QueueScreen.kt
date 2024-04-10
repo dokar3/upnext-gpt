@@ -213,7 +213,7 @@ private fun QueueList(
                 onClick = { onItemClick(it) },
                 onDelete = { onDelete(it) },
                 isCurrent = it.id == currTrackId,
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
             )
         }
     }
@@ -272,6 +272,7 @@ private fun TrackItem(
 
     SwipeToDismissBox(
         state = swipeToDismissState,
+        modifier = modifier,
         enableDismissFromEndToStart = swipeable,
         enableDismissFromStartToEnd = false,
         backgroundContent = {
@@ -292,11 +293,11 @@ private fun TrackItem(
         content = {
             Box(
                 modifier = Modifier
-                    .height(IntrinsicSize.Max)
+                    .height(IntrinsicSize.Min)
                     .background(MaterialTheme.colorScheme.background),
             ) {
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .clickable(onClick = onClick)
                         .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -324,7 +325,6 @@ private fun TrackItem(
                     )
                 }
             }
-
         },
     )
 }
