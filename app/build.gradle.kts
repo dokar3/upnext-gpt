@@ -14,8 +14,8 @@ android {
         applicationId = "com.dokar.upnextgpt"
         minSdk = 21
         targetSdk = 33
-        versionCode = 12
-        versionName = "1.11"
+        versionCode = 13
+        versionName = "1.12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
