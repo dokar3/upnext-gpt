@@ -64,7 +64,7 @@ class HomeViewModel(
         settings.currentPlayerFlow.collect { currPlayer ->
             player.updateTargetPlayer(packageName = currPlayer)
             val players = playerList.map {
-                it.copy(isActive = it.packageName == currPlayer)
+                it.copy(isActive = it.info.packageName == currPlayer)
             }
             _uiState.update { it.copy(players = players) }
         }
@@ -73,9 +73,9 @@ class HomeViewModel(
     private fun listenPlaybackStates() = viewModelScope.launch(dispatcher) {
         player.playbackInfoFlow().collect { info ->
             val packageName = info?.packageName
-                ?: uiState.value.activePlayer?.packageName
+                ?: uiState.value.activePlayer?.info?.packageName
             val players = playerList.map {
-                it.copy(isActive = packageName == it.packageName)
+                it.copy(isActive = packageName == it.info.packageName)
             }
             val currTrack = info?.toTrack()?.let {
                 val saved = trackRepo.get(id = it.id)
@@ -284,7 +284,7 @@ class HomeViewModel(
     fun playTrack(track: Track) {
         val currPlayer = uiState.value.activePlayer ?: return
         appLauncher.playTrack(
-            packageName = currPlayer.packageName,
+            packageName = currPlayer.info.packageName,
             title = track.title,
             artist = track.artist,
             album = track.album,
@@ -354,12 +354,12 @@ class HomeViewModel(
         _playerQueue.update { list }
     }
 
-    fun selectPlayer(meta: PlayerMeta) = viewModelScope.launch(dispatcher) {
+    fun selectPlayer(app: MusicApp) = viewModelScope.launch(dispatcher) {
         val currPlayer = uiState.value.activePlayer
-        if (currPlayer == meta) {
+        if (currPlayer == app) {
             return@launch
         }
-        settings.updateCurrentPlayer(meta.packageName)
+        settings.updateCurrentPlayer(app.info.packageName)
     }
 
     fun clearError() {
@@ -423,16 +423,16 @@ class HomeViewModel(
 
     private fun updatePlayerList() = viewModelScope.launch(dispatcher) {
         val newList = SupportedPlayers.map {
-            it.copy(isInstalled = appLauncher.isInstalled(it.packageName))
+            it.copy(isInstalled = appLauncher.isInstalled(it.info.packageName))
         }
         if (newList != playerList) {
             playerList = newList
             val isInstalledMap = newList.associate {
-                it.packageName to it.isInstalled
+                it.info.packageName to it.isInstalled
             }
             val players = uiState.value.players.map {
                 it.copy(
-                    isInstalled = isInstalledMap[it.packageName]
+                    isInstalled = isInstalledMap[it.info.packageName]
                         ?: it.isInstalled,
                 )
             }
@@ -446,7 +446,7 @@ class HomeViewModel(
         } else {
             val activePlayer = uiState.value.activePlayer
             if (activePlayer != null) {
-                appLauncher.launchPackage(activePlayer.packageName)
+                appLauncher.launchPackage(activePlayer.info.packageName)
             }
         }
     }
