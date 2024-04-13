@@ -62,14 +62,14 @@ object IntentUtil {
                 if (album != null) {
                     putExtra(MediaStore.EXTRA_MEDIA_ALBUM, album)
                 }
-                setPlayFromMediaQuery(packageName, title, artist)
+                setPlayFromSearchQuery(packageName, title, artist)
             }
         if (intent.resolveActivity(context.packageManager) != null) {
             context.startActivity(intent)
         }
     }
 
-    private fun Intent.setPlayFromMediaQuery(
+    private fun Intent.setPlayFromSearchQuery(
         packageName: String,
         title: String,
         artist: String
