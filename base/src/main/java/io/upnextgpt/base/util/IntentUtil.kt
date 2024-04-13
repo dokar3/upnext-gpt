@@ -8,6 +8,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.core.content.IntentCompat
 import io.upnextgpt.base.Logger
+import io.upnextgpt.base.MusicAppInfo
 import io.upnextgpt.base.SealedResult
 
 object IntentUtil {
@@ -61,11 +62,23 @@ object IntentUtil {
                 if (album != null) {
                     putExtra(MediaStore.EXTRA_MEDIA_ALBUM, album)
                 }
-                putExtra(SearchManager.QUERY, "$artist - $title")
+                setPlayFromSearchQuery(packageName, title, artist)
             }
         if (intent.resolveActivity(context.packageManager) != null) {
             context.startActivity(intent)
         }
+    }
+
+    private fun Intent.setPlayFromSearchQuery(
+        packageName: String,
+        title: String,
+        artist: String
+    ) {
+        val query = when (packageName) {
+            MusicAppInfo.AppleMusic.packageName -> title
+            else -> "$artist - $title"
+        }
+        putExtra(SearchManager.QUERY, query)
     }
 
     fun openUrl(context: Context, url: String) {

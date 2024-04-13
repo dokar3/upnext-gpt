@@ -34,15 +34,15 @@ import androidx.compose.ui.unit.sp
 import com.dokar.sheets.BottomSheetState
 import com.dokar.sheets.m3.BottomSheet
 import io.upnextgpt.base.ImmutableHolder
-import io.upnextgpt.ui.home.viewmodel.PlayerMeta
+import io.upnextgpt.ui.home.viewmodel.MusicApp
 import io.upnextgpt.ui.shared.widget.CardButton
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PlayerSelectorSheet(
     state: BottomSheetState,
-    items: ImmutableHolder<List<PlayerMeta>>,
-    onSelect: (item: PlayerMeta) -> Unit,
+    items: ImmutableHolder<List<MusicApp>>,
+    onSelect: (item: MusicApp) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BottomSheet(
@@ -76,7 +76,7 @@ internal fun PlayerSelectorSheet(
 
             items(
                 items = items.value,
-                key = { it.packageName },
+                key = { it.info.packageName },
             ) {
                 PlayerItem(
                     item = it,
@@ -90,27 +90,27 @@ internal fun PlayerSelectorSheet(
 
 @Composable
 private fun PlayerItem(
-    item: PlayerMeta,
+    item: MusicApp,
     onSelect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val enabled = item.isInstalled && !item.isActive
 
     val backgroundBrush =
-        remember(item.themeColor, item.isActive, item.isInstalled) {
+        remember(item.info.themeColor, item.isActive, item.isInstalled) {
             if (!item.isInstalled) {
                 Brush.linearGradient(
                     colors = listOf(
-                        item.themeColor.copy(alpha = 0.3f),
+                        item.info.themeColor.copy(alpha = 0.3f),
                         Color.Transparent,
                     ),
                 )
             } else if (item.isActive) {
-                SolidColor(item.themeColor)
+                SolidColor(item.info.themeColor)
             } else {
                 Brush.linearGradient(
                     colors = listOf(
-                        item.themeColor,
+                        item.info.themeColor,
                         Color.Transparent,
                     ),
                 )
@@ -138,13 +138,13 @@ private fun PlayerItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(item.iconRes),
+                    painter = painterResource(item.info.iconRes),
                     contentDescription = null,
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                Text(item.name)
+                Text(item.info.appName)
             }
 
             RadioButton(

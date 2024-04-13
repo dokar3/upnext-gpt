@@ -57,7 +57,7 @@ import io.upnextgpt.ui.home.control.PlayerProgressBar
 import io.upnextgpt.ui.home.control.UpNextCard
 import io.upnextgpt.ui.home.viewmodel.HomeUiState
 import io.upnextgpt.ui.home.viewmodel.HomeViewModel
-import io.upnextgpt.ui.home.viewmodel.PlayerMeta
+import io.upnextgpt.ui.home.viewmodel.MusicApp
 import io.upnextgpt.ui.shared.dialog.ConnectToPlayersDialog
 import io.upnextgpt.ui.shared.remember.rememberLifecycleEvent
 import io.upnextgpt.ui.shared.theme.warn
@@ -160,7 +160,7 @@ private fun Player(
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onSeek: (position: Long) -> Unit,
-    onSelectPlayer: (meta: PlayerMeta) -> Unit,
+    onSelectPlayer: (meta: MusicApp) -> Unit,
     onPlayPrev: () -> Unit,
     onPlayTrack: (track: Track) -> Unit,
     onFetchNextTrackClick: () -> Unit,
@@ -265,15 +265,15 @@ private fun Player(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 PlayerCard(
-                    playerName = currPlayer?.name ?: "-",
-                    iconRes = currPlayer?.iconRes ?: 0,
-                    themeColor = currPlayer?.themeColor
+                    playerName = currPlayer?.info?.appName ?: "-",
+                    iconRes = currPlayer?.info?.iconRes ?: 0,
+                    themeColor = currPlayer?.info?.themeColor
                         ?: MaterialTheme.colorScheme.secondary,
                     onClick = {
                         scope.launch { playerSelectorSheetState.expand() }
                     },
                     onLaunchPlayerClick = {
-                        val packageName = currPlayer?.packageName
+                        val packageName = currPlayer?.info?.packageName
                             ?: return@PlayerCard
                         when (val ret =
                             IntentUtil.launchApp(context, packageName)) {
