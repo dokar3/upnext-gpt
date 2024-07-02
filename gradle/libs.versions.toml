@@ -10,7 +10,6 @@ lifecycle-runtime-ktx = "2.8.3"
 activity-compose = "1.9.0"
 compose-bom = "2024.06.00"
 compose-bom-alpha = "2024.04.00-alpha02"
-compose-compiler = "1.5.11"
 compose-navigation = "2.7.7"
 appcompat = "1.7.0"
 material = "1.12.0"
@@ -75,6 +74,7 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 [bundles]
 
