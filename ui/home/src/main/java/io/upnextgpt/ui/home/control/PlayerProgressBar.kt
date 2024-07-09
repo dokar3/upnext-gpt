@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +16,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ir.mahozad.multiplatform.wavyslider.WaveDirection
+import ir.mahozad.multiplatform.wavyslider.material3.WaveVelocity
+import ir.mahozad.multiplatform.wavyslider.material3.WavySlider
 import kotlinx.coroutines.delay
 import kotlin.system.measureTimeMillis
 
@@ -83,14 +86,19 @@ internal fun PlayerProgressBar(
             Text(maxTime, fontSize = 14.sp)
         }
 
-        Slider(
+        WavySlider(
             value = currProgress,
             onValueChange = { onSeek((it * duration).toLong()) },
             modifier = Modifier.fillMaxWidth(),
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
                 activeTrackColor = MaterialTheme.colorScheme.secondary,
-            )
+            ),
+            waveVelocity = if (isPlaying) {
+                SliderDefaults.WaveVelocity
+            } else {
+                0.dp to WaveDirection.HEAD
+            },
         )
     }
 }

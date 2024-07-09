@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.sheets)
+    implementation(libs.wavySlider)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
