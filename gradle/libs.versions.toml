@@ -22,7 +22,7 @@ ksp = "2.0.0-1.0.22"
 moshi = "1.15.1"
 retrofit = "2.11.0"
 sqldelight = "2.0.2"
-coil = "2.6.0"
+coil = "2.7.0"
 diskLruCache = "2.0.2"
 wavySlider = "2.0.0-alpha"
 
